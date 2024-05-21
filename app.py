@@ -29,19 +29,24 @@ def check_answer():
     next_question()
 
 # Display the current question
-if 'index' in st.session_state:
-    current_question = questions_df.iloc[st.session_state.index]
-    st.write(f"Question {st.session_state.index + 1}: {current_question['Question']}")
-    st.radio("Options", ['a', 'b', 'c', 'd'], key='answer')
+current_question = questions_df.iloc[st.session_state.index]
 
-    if st.button("Submit"):
-        check_answer()
+st.write(f"Question {st.session_state.index + 1}: {current_question['Question']}")
+options = ['a', 'b', 'c', 'd']
 
-    st.write(f"Score: {st.session_state.score}")
+# Check if the 'answer' key is present in session state
+if 'answer' not in st.session_state:
+    st.session_state.answer = options[0]  # Initialize it with the first option
 
-    if st.session_state.index >= len(questions_df):
-        st.write("You've completed the quiz!")
-    else:
-        st.write("Next question will appear after submitting the current one.")
+# Use 'answer' as the key for the radio widget
+st.radio("Options", options, key='answer')
+
+if st.button("Submit"):
+    check_answer()
+
+st.write(f"Score: {st.session_state.score}")
+
+if st.session_state.index >= len(questions_df):
+    st.write("You've completed the quiz!")
 else:
-    st.write("Initializing...")
+    st.write("Next question will appear after submitting the current one.")
