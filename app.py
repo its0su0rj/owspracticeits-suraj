@@ -20,27 +20,27 @@ def next_question():
 
 # Function to check the answer
 def check_answer():
-    correct_answer = questions_df.iloc[st.session_state.index]['Answer']
-    if st.session_state.answer == correct_answer:
+    correct_answer = questions_df.iloc[st.session_state.index]['Correct Answer'].strip().lower()
+    selected_option = st.session_state.answer.split(".")[0].strip().lower()  # Extract the letter and convert to lowercase
+    if selected_option == correct_answer:
         st.session_state.score += 1
         st.success("Correct!")
     else:
-        st.error("Incorrect.")
+        st.error("Incorrect. The correct answer is " + correct_answer.upper() + ".")
     next_question()
 
 # Display the current question
 current_question = questions_df.iloc[st.session_state.index]
-
 st.write(f"Question {st.session_state.index + 1}: {current_question['Question']}")
 
 # Display radio options
-options = ['a', 'b', 'c', 'd']
-
-# Check if the selected answer is valid
-if st.session_state.answer not in options:
-    st.session_state.answer = options[0]  # Set default to first option
-
-st.radio("Options", options, index=options.index(st.session_state.answer), key='answer')
+options = [
+    current_question['Option A'],
+    current_question['Option B'],
+    current_question['Option C'],
+    current_question['Option D']
+]
+st.radio("Options", options, key='answer')
 
 if st.button("Submit"):
     check_answer()
