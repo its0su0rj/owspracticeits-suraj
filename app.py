@@ -11,6 +11,8 @@ if 'score' not in st.session_state:
     st.session_state.score = 0
 if 'submitted' not in st.session_state:
     st.session_state.submitted = False
+if 'answer' not in st.session_state:
+    st.session_state.answer = ""
 
 # Function to load the next question
 def next_question():
@@ -43,7 +45,7 @@ options = [
 ]
 
 # Radio button to select the answer
-st.session_state.answer = st.radio("Options", options, key='answer')
+st.session_state.answer = st.radio("Options", options, index=options.index(st.session_state.answer) if st.session_state.answer in options else 0)
 
 # Submit button
 if st.button("Submit") and not st.session_state.submitted:
