@@ -1,69 +1,47 @@
 import streamlit as st
-import fitz  # pymupdf
-import random
+import pandas as pd
 
-# Function to read the PDF and extract questions and answers
-def read_pdf(file_path):
-    doc = fitz.open(file_path)
-    questions = []
-    current_question = None
-    options = []
-    correct_answer = None
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        text = page.get_text("text")
-        lines = text.split('\n')
-        for line in lines:
-            if any(line.strip().endswith(f"{chr(97 + i)}.") for i in range(4)):  # a., b., c., d.
-                if current_question and options:
-                    questions.append((current_question, options, correct_answer))
-                current_question = line.strip()
-                options = []
-                correct_answer = None
-            elif line.strip().startswith("Answer:"):
-                correct_answer = line.split()[-1].lower()  # 'a', 'b', 'c', or 'd'
-            elif line.strip() and not any(line.strip().endswith(f"{chr(97 + i)}.") for i in range(4)):
-                options.append(line.strip())
-        if current_question and options:
-            questions.append((current_question, options, correct_answer))
-    return questions
+# Load the CSV file
+questions_df = pd.read_csv('owsqa.csv')
 
-# Load the questions and answers
-questions = read_pdf("ows.pdf")
-
-# Shuffle the questions to ensure randomness
-random.shuffle(questions)
-
-# Initialize session state
-if "index" not in st.session_state:
+# Initialize session state variables
+if 'index' not in st.session_state:
     st.session_state.index = 0
+if 'score' not in st.session_state:
+    st.session_state.score = 0
+if 'answer' not in st.session_state:
+    st.session_state.answer = ""
 
-index = st.session_state.index
-
-# Main app
-st.title("One Word Substitution Practice")
-
-def display_question(index):
-    question, options, correct_answer = questions[index]
-    st.write(f"**Question {index + 1}:** {question}")
-    selected_option = st.radio("Select an option", options, key=f"option{index}")
-    return correct_answer, selected_option
-
-def check_answer(correct_answer, selected_option):
-    if selected_option and correct_answer and selected_option[0].lower() == correct_answer:
-        return "Correct!"
-    else:
-        return f"Wrong! The correct answer is {correct_answer.upper()}."
-
-correct_answer, selected_option = display_question(index)
-
-if st.button("Submit"):
-    feedback = check_answer(correct_answer, selected_option)
-    st.write(feedback)
-    if index < len(questions) - 1:
+# Function to load the next question
+def next_question():
+    if st.session_state.index < len(questions_df) - 1:
         st.session_state.index += 1
-        st.experimental_rerun()
+        st.session_state.answer = ""
+
+# Function to check the answer
+def check_answer():
+    correct_answer = questions_df.iloc[st.session_state.index]['Answer']
+    if st.session_state.answer == correct_answer:
+        st.session_state.score += 1
+        st.success("Correct!")
     else:
-        st.write("You have completed all the questions.")
+        st.error("Incorrect.")
+    next_question()
+
+# Display the current question
+if 'index' in st.session_state:
+    current_question = questions_df.iloc[st.session_state.index]
+    st.write(f"Question {st.session_state.index + 1}: {current_question['Question']}")
+    st.radio("Options", ['a', 'b', 'c', 'd'], key='answer')
+
+    if st.button("Submit"):
+        check_answer()
+
+    st.write(f"Score: {st.session_state.score}")
+
+    if st.session_state.index >= len(questions_df):
+        st.write("You've completed the quiz!")
+    else:
+        st.write("Next question will appear after submitting the current one.")
 else:
-    st.write("Select an answer and submit to get feedback.")
+    st.write("Initializing...")
