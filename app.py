@@ -29,26 +29,12 @@ def read_pdf(file_path):
     return questions
 
 # Load the questions and answers
-questions = read_pdf("ows.pdf")
+questions = read_pdf("/mnt/data/ows.pdf")
 
 # Shuffle the questions to ensure randomness
 random.shuffle(questions)
 
-# Function to display a question
-def display_question(index):
-    question, options, correct_answer = questions[index]
-    st.write(f"**Question {index + 1}:** {question}")
-    selected_option = st.radio("Select an option", options, key=f"option{index}")
-    return correct_answer, selected_option
-
-# Function to check the answer
-def check_answer(correct_answer, selected_option):
-    if selected_option and correct_answer and selected_option[0].lower() == correct_answer:
-        return "Correct!"
-    else:
-        return f"Wrong! The correct answer is {correct_answer.upper()}."
-
-# Initialize session state using st.session_state.get
+# Initialize session state
 if "index" not in st.session_state:
     st.session_state.index = 0
 
@@ -57,6 +43,18 @@ index = st.session_state.index
 # Main app
 st.title("One Word Substitution Practice")
 
+def display_question(index):
+    question, options, correct_answer = questions[index]
+    st.write(f"**Question {index + 1}:** {question}")
+    selected_option = st.radio("Select an option", options, key=f"option{index}")
+    return correct_answer, selected_option
+
+def check_answer(correct_answer, selected_option):
+    if selected_option and correct_answer and selected_option[0].lower() == correct_answer:
+        return "Correct!"
+    else:
+        return f"Wrong! The correct answer is {correct_answer.upper()}."
+
 correct_answer, selected_option = display_question(index)
 
 if st.button("Submit"):
@@ -64,5 +62,8 @@ if st.button("Submit"):
     st.write(feedback)
     if index < len(questions) - 1:
         st.session_state.index += 1
+        st.experimental_rerun()
+    else:
+        st.write("You have completed all the questions.")
 else:
     st.write("Select an answer and submit to get feedback.")
