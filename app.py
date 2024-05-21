@@ -38,7 +38,7 @@ def read_pdf(file_path):
     return questions
 
 # Load the questions and answers
-questions = read_pdf("/content/2023-10-30-0.6506828513841263.pdf")
+questions = read_pdf("ows.pdf")
 
 # Shuffle the questions to ensure randomness
 random.shuffle(questions)
