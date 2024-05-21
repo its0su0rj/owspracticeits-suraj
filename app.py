@@ -32,14 +32,10 @@ def check_answer():
 current_question = questions_df.iloc[st.session_state.index]
 
 st.write(f"Question {st.session_state.index + 1}: {current_question['Question']}")
+
+# Display radio options
 options = ['a', 'b', 'c', 'd']
-
-# Check if the 'answer' key is present in session state
-if 'answer' not in st.session_state:
-    st.session_state.answer = options[0]  # Initialize it with the first option
-
-# Use 'answer' as the key for the radio widget
-st.radio("Options", options, key='answer')
+st.radio("Options", options, index=options.index(st.session_state.answer) if st.session_state.answer else None, key='answer')
 
 if st.button("Submit"):
     check_answer()
