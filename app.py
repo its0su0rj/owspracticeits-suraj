@@ -35,8 +35,12 @@ st.write(f"Question {st.session_state.index + 1}: {current_question['Question']}
 
 # Display radio options
 options = ['a', 'b', 'c', 'd']
-selected_index = options.index(st.session_state.answer) if st.session_state.answer in options else None
-st.radio("Options", options, index=selected_index, key='answer')
+
+# Check if the selected answer is valid
+if st.session_state.answer not in options:
+    st.session_state.answer = options[0]  # Set default to first option
+
+st.radio("Options", options, index=options.index(st.session_state.answer), key='answer')
 
 if st.button("Submit"):
     check_answer()
