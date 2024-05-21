@@ -9,8 +9,6 @@ if 'index' not in st.session_state:
     st.session_state.index = 0
 if 'score' not in st.session_state:
     st.session_state.score = 0
-if 'answer' not in st.session_state:
-    st.session_state.answer = ""
 if 'submitted' not in st.session_state:
     st.session_state.submitted = False
 
@@ -18,8 +16,8 @@ if 'submitted' not in st.session_state:
 def next_question():
     if st.session_state.index < len(questions_df) - 1:
         st.session_state.index += 1
-        st.session_state.answer = ""
         st.session_state.submitted = False
+        st.session_state.answer = ""
 
 # Function to check the answer
 def check_answer():
@@ -43,10 +41,12 @@ options = [
     current_question['Option C'],
     current_question['Option D']
 ]
-st.radio("Options", options, key='answer')
+
+# Radio button to select the answer
+st.session_state.answer = st.radio("Options", options, key='answer')
 
 # Submit button
-if st.button("Submit"):
+if st.button("Submit") and not st.session_state.submitted:
     check_answer()
 
 # Only show the "Next Question" button if the answer has been submitted
