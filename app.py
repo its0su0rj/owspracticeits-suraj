@@ -11,12 +11,15 @@ if 'score' not in st.session_state:
     st.session_state.score = 0
 if 'answer' not in st.session_state:
     st.session_state.answer = ""
+if 'submitted' not in st.session_state:
+    st.session_state.submitted = False
 
 # Function to load the next question
 def next_question():
     if st.session_state.index < len(questions_df) - 1:
         st.session_state.index += 1
         st.session_state.answer = ""
+        st.session_state.submitted = False
 
 # Function to check the answer
 def check_answer():
@@ -26,8 +29,8 @@ def check_answer():
         st.session_state.score += 1
         st.success("Correct!")
     else:
-        st.error("Incorrect. The correct answer is " + correct_answer.upper() + ".")
-    next_question()
+        st.error(f"Incorrect. The correct answer is {correct_answer.upper()}.")
+    st.session_state.submitted = True
 
 # Display the current question
 current_question = questions_df.iloc[st.session_state.index]
@@ -42,12 +45,17 @@ options = [
 ]
 st.radio("Options", options, key='answer')
 
+# Submit button
 if st.button("Submit"):
     check_answer()
 
+# Only show the "Next Question" button if the answer has been submitted
+if st.session_state.submitted:
+    if st.button("Next Question"):
+        next_question()
+
 st.write(f"Score: {st.session_state.score}")
 
+# End of quiz message
 if st.session_state.index >= len(questions_df):
     st.write("You've completed the quiz!")
-else:
-    st.write("Next question will appear after submitting the current one.")
