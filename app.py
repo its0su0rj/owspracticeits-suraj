@@ -3,12 +3,12 @@ import pandas as pd
 import time
 import glob
 
-# Function to load questions from CSV files
+# Function to load questions from a CSV file
 def load_questions(set_name):
     df = pd.read_csv(f"{set_name}.csv")
     return df
 
-# Function to calculate score and generate results
+# Function to calculate the user's score and identify incorrect answers
 def calculate_results(df, answers):
     score = 0
     results = []
@@ -24,11 +24,11 @@ def calculate_results(df, answers):
 # Streamlit app
 st.title("OWS Question Practice")
 
-# Get all available sets
+# Get all available sets (CSV files)
 sets = glob.glob("set*.csv")
 sets = [set_name.split(".csv")[0] for set_name in sets]
 
-# Dropdown to select set
+# Dropdown to select a set
 set_name = st.selectbox("Select a set to practice:", sets)
 
 if set_name:
@@ -39,11 +39,12 @@ if set_name:
     st.write(f"Total questions: {num_questions}")
     st.write(f"Time limit: {time_limit / 60:.2f} minutes")
 
-    # Timer
-    start_time = st.empty()
-    timer = time.time()
+    # Timer start
+    start_time = time.time()
+    elapsed_time = 0
+    timer_text = st.empty()
 
-    # Form to display questions
+    # Form to display questions and options
     with st.form("questions_form"):
         answers = {}
         for i, row in df.iterrows():
@@ -55,9 +56,11 @@ if set_name:
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
+            # Calculate time taken
             end_time = time.time()
-            time_taken = end_time - timer
+            time_taken = end_time - start_time
 
+            # Calculate score and show results
             score, results = calculate_results(df, answers)
             st.write(f"Your score: {score}/{num_questions}")
             st.write(f"Time taken: {time_taken / 60:.2f} minutes")
@@ -69,6 +72,11 @@ if set_name:
                     st.write(f"Your answer: {user_answer}")
                     st.write(f"Correct answer: {correct_answer}")
 
-            start_time.empty()
 else:
     st.write("Please select a set to start practicing.")
+
+# Update timer every second
+while elapsed_time < time_limit:
+    elapsed_time = time.time() - start_time
+    timer_text.text(f"Time elapsed: {elapsed_time / 60:.2f} minutes")
+    time.sleep(1)
