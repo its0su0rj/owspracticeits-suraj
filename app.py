@@ -39,10 +39,9 @@ if set_name:
     st.write(f"Total questions: {num_questions}")
     st.write(f"Time limit: {time_limit / 60:.2f} minutes")
 
-    # Timer start
-    start_time = time.time()
-    elapsed_time = 0
-    timer_text = st.empty()
+    # Initialize timer
+    if "start_time" not in st.session_state:
+        st.session_state.start_time = time.time()
 
     # Form to display questions and options
     with st.form("questions_form"):
@@ -58,7 +57,7 @@ if set_name:
         if submit_button:
             # Calculate time taken
             end_time = time.time()
-            time_taken = end_time - start_time
+            time_taken = end_time - st.session_state.start_time
 
             # Calculate score and show results
             score, results = calculate_results(df, answers)
@@ -74,9 +73,3 @@ if set_name:
 
 else:
     st.write("Please select a set to start practicing.")
-
-# Update timer every second
-while elapsed_time < time_limit:
-    elapsed_time = time.time() - start_time
-    timer_text.text(f"Time elapsed: {elapsed_time / 60:.2f} minutes")
-    time.sleep(1)
