@@ -1,76 +1,74 @@
 import streamlit as st
 import pandas as pd
+import time
+import glob
 
-# Load the CSV file
-questions_df = pd.read_csv('owsqa.csv')
+# Function to load questions from CSV files
+def load_questions(set_name):
+    df = pd.read_csv(f"{set_name}.csv")
+    return df
 
-# Initialize session state variables
-if 'index' not in st.session_state:
-    st.session_state.index = 0
-if 'score' not in st.session_state:
-    st.session_state.score = 0
-if 'submitted' not in st.session_state:
-    st.session_state.submitted = False
-if 'answer' not in st.session_state:
-    st.session_state.answer = ""
-if 'incorrect_answers' not in st.session_state:
-    st.session_state.incorrect_answers = []
+# Function to calculate score and generate results
+def calculate_results(df, answers):
+    score = 0
+    results = []
+    for i, row in df.iterrows():
+        correct_answer = row['correct_answer']
+        user_answer = answers.get(row['question_no'])
+        if user_answer == correct_answer:
+            score += 1
+        else:
+            results.append((row['question'], user_answer, correct_answer))
+    return score, results
 
-# Function to load the next question
-def next_question():
-    if st.session_state.index < len(questions_df) - 1:
-        st.session_state.index += 1
-        st.session_state.submitted = False
-        st.session_state.answer = ""
+# Streamlit app
+st.title("OWS Question Practice")
 
-# Function to check the answer
-def check_answer():
-    correct_answer = questions_df.iloc[st.session_state.index]['Correct Answer'].strip().lower()
-    selected_option = st.session_state.answer.split(".")[0].strip().lower()  # Extract the letter and convert to lowercase
-    if selected_option == correct_answer:
-        st.session_state.score += 1
-        st.success("Correct!")
-    else:
-        st.error(f"Incorrect. The correct answer is {correct_answer.upper()}.")
-        st.session_state.incorrect_answers.append({
-            "Question": questions_df.iloc[st.session_state.index]['Question'],
-            "Your Answer": st.session_state.answer,
-            "Correct Answer": correct_answer.upper()
-        })
-    st.session_state.submitted = True
+# Get all available sets
+sets = glob.glob("set*.csv")
+sets = [set_name.split(".csv")[0] for set_name in sets]
 
-# Display the current question
-current_question = questions_df.iloc[st.session_state.index]
-st.write(f"Question {st.session_state.index + 1} of {len(questions_df)}: {current_question['Question']}")
+# Dropdown to select set
+set_name = st.selectbox("Select a set to practice:", sets)
 
-# Display radio options
-options = [
-    current_question['Option A'],
-    current_question['Option B'],
-    current_question['Option C'],
-    current_question['Option D']
-]
+if set_name:
+    df = load_questions(set_name)
+    num_questions = len(df)
+    time_limit = num_questions / 5 * 60  # Time limit in seconds
 
-# Radio button to select the answer
-st.session_state.answer = st.radio("Options", options, index=options.index(st.session_state.answer) if st.session_state.answer in options else 0)
+    st.write(f"Total questions: {num_questions}")
+    st.write(f"Time limit: {time_limit / 60:.2f} minutes")
 
-# Submit button
-if st.button("Submit") and not st.session_state.submitted:
-    check_answer()
+    # Timer
+    start_time = st.empty()
+    timer = time.time()
 
-# Only show the "Next Question" button if the answer has been submitted
-if st.session_state.submitted:
-    if st.button("Next Question"):
-        next_question()
+    # Form to display questions
+    with st.form("questions_form"):
+        answers = {}
+        for i, row in df.iterrows():
+            question = row['question']
+            options = [row['option1'], row['option2'], row['option3'], row['option4']]
+            st.write(f"Q{i+1}: {question}")
+            answers[row['question_no']] = st.radio(f"Options for Q{i+1}", options)
 
-st.write(f"Score: {st.session_state.score}")
+        submit_button = st.form_submit_button("Submit")
 
-# End of quiz message
-if st.session_state.index >= len(questions_df):
-    st.write("You've completed the quiz!")
-    if st.session_state.incorrect_answers:
-        st.write("Review your incorrect answers:")
-        for i, incorrect in enumerate(st.session_state.incorrect_answers):
-            st.write(f"{i+1}. Question: {incorrect['Question']}")
-            st.write(f"   Your Answer: {incorrect['Your Answer']}")
-            st.write(f"   Correct Answer: {incorrect['Correct Answer']}")
+        if submit_button:
+            end_time = time.time()
+            time_taken = end_time - timer
+
+            score, results = calculate_results(df, answers)
+            st.write(f"Your score: {score}/{num_questions}")
+            st.write(f"Time taken: {time_taken / 60:.2f} minutes")
+
+            if results:
+                st.write("Questions you got wrong:")
+                for question, user_answer, correct_answer in results:
+                    st.write(f"Question: {question}")
+                    st.write(f"Your answer: {user_answer}")
+                    st.write(f"Correct answer: {correct_answer}")
+
+            start_time.empty()
+else:
+    st.write("Please select a set to start practicing.")
