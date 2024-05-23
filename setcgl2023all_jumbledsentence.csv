@@ -1,0 +1,137 @@
+question_no,question,option1,option2,option3,option4,correct_answer
+1,"A. Bats are nocturnal animals. B. They use echolocation to navigate. C. Echolocation helps them find food in the dark. D. They are active during the night.",ABCD,ACBD,BADC,BCAD,BCAD
+2,"A. The rainforests are home to a diverse range of species. B. Many species are still undiscovered. C. They are being destroyed at an alarming rate. D. Conservation efforts are crucial.",ABCD,BADC,DCAB,CDBA,DCAB
+3,"A. The invention of the printing press revolutionized communication. B. Books became more accessible. C. Knowledge spread rapidly. D. Literacy rates increased.",ABCD,BACD,CABD,BDCA,BACD
+4,"A. Photosynthesis is a process used by plants. B. It converts light energy into chemical energy. C. This energy is stored in the form of glucose. D. Oxygen is released as a byproduct.",ACBD,ABCD,ADBC,BDAC,ACBD
+5,"A. The Great Wall of China is an ancient fortification. B. It was built to protect against invasions. C. It stretches over 13,000 miles. D. It is one of the Seven Wonders of the World.",ABCD,BACD,CBDA,DBAC,BACD
+6,"A. The internet has transformed communication. B. It allows instant messaging. C. People can video chat across the globe. D. Social media platforms have gained popularity.",ABCD,ACBD,CABD,BCDA,ACBD
+7,"A. Water is essential for all living organisms. B. It is involved in various biochemical processes. C. It regulates body temperature. D. It makes up a significant part of the human body.",ABCD,ACBD,BCDA,BDCA,ACBD
+8,"A. The Solar System consists of the Sun and eight planets. B. Each planet orbits the Sun. C. The planets vary in size and composition. D. The Sun is the central star.",ABCD,ACBD,BDAC,CDBA,ACBD
+9,"A. Exercise has numerous health benefits. B. It strengthens muscles. C. It improves cardiovascular health. D. It boosts mental well-being.",ABCD,BACD,CABD,BDCA,BACD
+10,"A. Recycling helps reduce waste. B. It conserves natural resources. C. It saves energy. D. It decreases pollution.",ABCD,BACD,BDCA,CDAB,BACD
+11,"A: In recent years, the road safety has become a very serious issue in India.
+B: It is important to create awareness about road safety.
+C: The increase in the number of vehicles has led to a rise in road accidents.
+D: Strict traffic rules need to be implemented to reduce accidents.","ACBD","CABD","BCAD","DBCA","ACBD"
+12,"A: The history of astronomy is as old as civilization itself.
+B: It has evolved through various stages from ancient to modern times.
+C: Astronomy has always fascinated mankind.
+D: In ancient times, people used to observe the night sky with naked eyes.","CADB","BDCA","DABC","ABCD","CADB"
+13,"A: The internet has revolutionized the way we communicate.
+B: It has made information easily accessible to everyone.
+C: Social media platforms have brought people closer.
+D: However, it has also raised concerns about privacy.","ABCD","BADC","CDAB","DCBA","ABCD"
+14,"A: India is known for its rich cultural heritage.
+B: Every state has its own unique traditions and customs.
+C: Festivals are celebrated with great enthusiasm.
+D: Indian culture is a blend of various cultures and traditions.","DABC","BCDA","ACBD","DBCA","DABC"
+15,"A: The importance of education cannot be overstated.
+B: It is the foundation of a successful life.
+C: Education helps in the overall development of an individual.
+D: It opens up new opportunities and avenues.","ABCD","BADC","CDAB","DABC","ABCD"
+16,"A: Technology has changed the way we live.
+B: It has made our lives easier and more convenient.
+C: However, it has also made us dependent on gadgets.
+D: We need to use technology wisely.","ABCD","BCDA","CDBA","DABC","ABCD"
+17,"A: Environmental pollution is a major concern today.
+B: It has harmful effects on health and the ecosystem.
+C: Measures need to be taken to reduce pollution.
+D: Everyone should contribute towards a cleaner environment.","ABCD","BADC","CDAB","DABC","ABCD"
+18,"A: Reading books is a good habit.
+B: It enhances knowledge and vocabulary.
+C: Books can be a great source of entertainment.
+D: Everyone should cultivate the habit of reading.","ABCD","BADC","CDAB","DABC","ABCD"
+19,"A: Sports are an essential part of a healthy lifestyle.
+B: They keep us physically and mentally fit.
+C: Playing sports helps in developing team spirit.
+D: It is important to encourage sports activities.","ABCD","BADC","CDAB","DABC","ABCD"
+20,"A: Music is a universal language.
+B: It has the power to bring people together.
+C: Different genres of music appeal to different people.
+D: Music can be a source of comfort and joy.","ABCD","BADC","CDAB","DABC","ABCD"
+21,"A: The importance of time management cannot be ignored.
+B: It helps in achieving goals efficiently.
+C: Time management skills are crucial for success.
+D: Everyone should learn to manage their time effectively.","ABCD","BADC","CDAB","DABC","ABCD"
+22,"A: Cleanliness is next to godliness.
+B: A clean environment is essential for good health.
+C: We should keep our surroundings clean.
+D: Cleanliness habits should be inculcated from childhood.","ABCD","BADC","CDAB","DABC","ABCD"
+23,"A: Traveling is a great way to learn about new cultures.
+B: It broadens our perspective.
+C: Traveling can be an enriching experience.
+D: It helps in understanding different ways of life.","ABCD","BADC","CDAB","DABC","ABCD"
+24,"A: Exercise is important for maintaining good health.
+B: It helps in keeping the body fit and active.
+C: Regular exercise can prevent many health problems.
+D: Everyone should include exercise in their daily routine.","ABCD","BADC","CDAB","DABC","ABCD"
+25,"A: The role of teachers in society is crucial.
+B: They shape the future of the nation.
+C: Teachers impart knowledge and values to students.
+D: Their contribution to society is invaluable.","ABCD","BADC","CDAB","DABC","ABCD"
+26,"A: The impact of climate change is evident.
+B: It has led to extreme weather conditions.
+C: Global efforts are needed to combat climate change.
+D: Everyone should be aware of its consequences.","ABCD","BADC","CDAB","DABC","ABCD"
+27,"A: Science and technology have transformed our lives.
+B: They have made incredible advancements possible.
+C: Innovations in these fields continue to improve our quality of life.
+D: The future holds even more exciting possibilities.","ABCD","BADC","CDAB","DABC","ABCD"
+28,"A: The importance of good nutrition cannot be overstated.
+B: It is essential for overall health and well-being.
+C: A balanced diet provides all the necessary nutrients.
+D: Everyone should be mindful of their dietary choices.","ABCD","BADC","CDAB","DABC","ABCD"
+29,"A: The digital revolution has changed the way we work.
+B: Remote working has become more common.
+C: Digital tools have increased productivity.
+D: However, it has also blurred the lines between work and personal life.","ABCD","BADC","CDAB","DABC","ABCD"
+30,"A: The significance of mental health is gaining recognition.
+B: It is as important as physical health.
+C: Mental health issues should not be stigmatized.
+D: Everyone should take care of their mental well-being.","ABCD","BADC","CDAB","DABC","ABCD"
+31,The man is bald. He is wearing a blue shirt. He is my uncle. He is very tall.,DBCA,BADC,CDAB,ACBD,DBCA
+32,She loves reading. She has a huge collection of books. She reads every night before bed. She often visits the library.,ACBD,BDCA,DABC,CDBA,ACBD
+33,The child is crying. He has lost his toy. He is looking for it everywhere. He can't find it.,BDCA,CADB,DABC,CBAD,BDCA
+34,The cake is delicious. It is chocolate flavored. It has a creamy texture. Everyone at the party enjoyed it.,CABD,ABCD,BCDA,DBCA,CABD
+35,The dog is barking loudly. It sees a stranger. It runs towards the gate. It stops when called.,BCAD,DCAB,ADCB,CADB,BCAD
+36,The sun rises in the east. It sets in the west. It is very bright. It gives us light.,ADBC,BADC,CDBA,DCBA,ADBC
+37,The flowers are blooming. The garden looks beautiful. It has various colors. It smells wonderful.,DBCA,ACBD,CABD,BADC,DBCA
+38,The teacher is explaining a lesson. The students are listening attentively. They are taking notes. The classroom is quiet.,BCDA,DABC,ABDC,CDBA,BCDA
+39,The car broke down. We had to call a mechanic. He fixed it quickly. We were able to continue our journey.,ACBD,CADB,BDAC,DBCA,ACBD
+40,The book is on the table. It is a mystery novel. I am reading it. It is very interesting.,BCAD,DCBA,ADCB,CABD,BCAD
+41,The house is being painted. It will be white. The painters are working hard. It will look new.,CABD,DBAC,BACD,ACBD,CABD
+42,She is making a cake. She needs flour. She has all the other ingredients. She will bake it soon.,DCAB,ACBD,BDCA,CBAD,DCAB
+43,The bird is singing. It is sitting on a tree. The tree has green leaves. The garden is peaceful.,BDAC,CADB,ADCB,BCDA,BDAC
+44,He is a doctor. He works at a hospital. He helps many patients. He loves his job.,BCDA,DABC,CABD,ADBC,BCDA
+45,The movie was exciting. It had great special effects. The actors performed well. The audience loved it.,ADCB,CABD,BDCA,DBAC,ADCB
+46,The shop is open. It sells clothes. It has a variety of items. The prices are reasonable.,DBCA,ACBD,BADC,CABD,DBCA
+47,The rain is pouring. The streets are wet. People are using umbrellas. The weather is cold.,BCAD,ADCB,DABC,CBDA,BCAD
+48,The laptop is new. It has many features. It is fast. It is perfect for work.,BDAC,ACBD,CDBA,DABC,BDAC
+49,The cat is sleeping. It is on the sofa. It looks comfortable. It is purring softly.,CADB,BCAD,DABC,ABCD,CADB
+50,The museum is interesting. It has many exhibits. It is very educational. Visitors enjoy it.,ACBD,BCDA,DACB,DBCA,ACBD
+51,The road is narrow. It is surrounded by trees. It leads to the village. It is very scenic.,BCAD,ACDB,DCBA,CABD,BCAD
+52,She is learning French. She practices every day. She uses an app. She is getting better.,ADBC,BCDA,CABD,DBCA,ADBC
+53,The phone rang. I answered it. It was a wrong number. I hung up.,CADB,DBAC,ACBD,BCDA,CADB
+54,The cake was baked. It was decorated. It was served. It was eaten quickly.,DBCA,CABD,BADC,ADBC,DBCA
+55,The train arrived. The passengers got off. The platform was crowded. The train left.,ACBD,CADB,DBCA,BACD,ACBD
+56,The dog is playful. It likes to fetch. It enjoys running. It is very active.,BCAD,DCBA,ADCB,CADB,BCAD
+57,She is knitting a sweater. She bought the yarn yesterday. She chose a beautiful color. She is very skilled.,BDAC,ACBD,CADB,DABC,BDAC
+58,The book is old. It has yellowed pages. It is a classic. It is still read today.,CADB,BCAD,DBCA,ADBC,CADB
+59,The sun is shining. The sky is clear. The weather is warm. It is a perfect day.,BCDA,ADCB,DABC,CABD,BCDA
+60,The market is busy. There are many stalls. People are shopping. The atmosphere is lively.,ACBD,BDAC,DCBA,CADB,ACBD
+61,The baby is laughing. She is playing with her toys. Her mother is watching. The room is filled with joy.,BDCA,CADB,ACBD,DBAC,BDCA
+62,The festival is celebrated every year. It is a grand event. People from all over attend. It is full of excitement.,ACBD,DBCA,BCAD,CABD,ACBD
+63,The river is flowing. It is very wide. It has clean water. People enjoy swimming in it.,BCDA,ADBC,DACB,CADB,BCDA
+64,The book was published. It received good reviews. It became a bestseller. The author was happy.,DBAC,ACBD,BCDA,CADB,DBAC
+65,The movie is about space. It has stunning visuals. The story is captivating. It was a huge hit.,ACBD,BDCA,DCAB,CADB,ACBD
+66,The tree is tall. It has many branches. It provides shade. It is home to many birds.,BCDA,ADBC,CADB,DCAB,BCDA
+67,The concert was amazing. The band played well. The crowd cheered loudly. The atmosphere was electrifying.,BDAC,ACBD,CDBA,DBCA,BDAC
+68,The pizza is hot. It is cheesy. It has a crispy crust. It tastes delicious.,CADB,BCDA,DBAC,ADBC,CADB
+69,The garden is beautiful. It has colorful flowers. It is well-maintained. It is a pleasure to walk in.,DBCA,ACBD,BADC,CADB,DBCA
+70,The lake is calm. It reflects the sky. It is surrounded by trees. It is a serene spot.,BCAD,ADBC,DACB,CDBA,BCAD
+71,The cat climbed the tree. It got stuck. It meowed for help. Someone rescued it.,BDAC,CABD,ACDB,DCBA,BDAC
+72,The book is on the shelf. It is about history. It has many illustrations. It is very informative.,ACBD,BCAD,DCBA,CABD,ACBD
+73,The park is crowded. Children are playing. Adults are jogging. Everyone is having fun.,BCDA,DABC,ACBD,DBCA,BCDA
+74,The car is new. It is red. It has a powerful engine. It drives smoothly.,BDAC,ACBD,CADB,DCBA,BDAC
+75,The house is big. It has many rooms. It is well-furnished. It is very comfortable.,CADB,BCDA,DBAC,ADBC,CADB
+76,The storm is coming. The sky is dark. The wind is strong. People are taking shelter.,DBCA,ACBD,BCDA,CADB,DBCA
