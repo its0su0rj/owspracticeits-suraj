@@ -40,15 +40,35 @@ def save_results(candidate_name, set_name, score, num_questions, time_taken):
     # Save the updated results back to the CSV file
     results_df.to_csv(results_file, index=False)
 
+# Function to load and display results for a specific candidate
+def load_results(candidate_name):
+    results_file = f"{candidate_name}_results.csv"
+    if os.path.exists(results_file):
+        results_df = pd.read_csv(results_file)
+        return results_df
+    else:
+        return None
+
 # Streamlit app
 st.title("OWS Question Practice")
+
+# Input for viewing results
+view_name = st.text_input("Enter your name to view results:")
+
+if st.button("View Results"):
+    results_df = load_results(view_name)
+    if results_df is not None:
+        st.write(f"Results for {view_name}:")
+        st.dataframe(results_df)
+    else:
+        st.write("No results found for this name.")
 
 # Get all available sets (CSV files)
 sets = glob.glob("set*.csv")
 sets = [set_name.split(".csv")[0] for set_name in sets]
 
-# Ask for the candidate's name
-candidate_name = st.text_input("Enter your name:")
+# Ask for the candidate's name for practicing
+candidate_name = st.text_input("Enter your name to practice:")
 
 # Dropdown to select a set
 set_name = st.selectbox("Select a set to practice:", sets)
