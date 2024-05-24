@@ -49,6 +49,26 @@ def load_results(candidate_name):
     else:
         return None
 
+# Function to check if the candidate credentials are valid
+def check_credentials(candidate_name, candidate_password):
+    if os.path.exists("candidates.csv"):
+        candidates_df = pd.read_csv("candidates.csv")
+        candidate_row = candidates_df[candidates_df['name'] == candidate_name]
+        if not candidate_row.empty and candidate_row.iloc[0]['password'] == candidate_password:
+            return True
+    return False
+
+# Function to add a new candidate
+def add_candidate(candidate_name, candidate_password):
+    if os.path.exists("candidates.csv"):
+        candidates_df = pd.read_csv("candidates.csv")
+    else:
+        candidates_df = pd.DataFrame(columns=["name", "password"])
+
+    new_entry = pd.DataFrame([[candidate_name, candidate_password]], columns=["name", "password"])
+    candidates_df = pd.concat([candidates_df, new_entry], ignore_index=True)
+    candidates_df.to_csv("candidates.csv", index=False)
+
 # Streamlit app
 st.title("OWS Question Practice")
 
@@ -67,54 +87,68 @@ if st.button("View Results"):
 sets = glob.glob("set*.csv")
 sets = [set_name.split(".csv")[0] for set_name in sets]
 
-# Ask for the candidate's name for practicing
+# Section to add a new candidate
+st.header("Add New Candidate")
+new_candidate_name = st.text_input("Enter new candidate name:")
+new_candidate_password = st.text_input("Enter new candidate password:", type="password")
+if st.button("Add Candidate"):
+    add_candidate(new_candidate_name, new_candidate_password)
+    st.write(f"Candidate {new_candidate_name} added successfully.")
+
+# Section to practice
+st.header("Practice Questions")
 candidate_name = st.text_input("Enter your name to practice:")
+candidate_password = st.text_input("Enter your password:", type="password")
 
 # Dropdown to select a set
 set_name = st.selectbox("Select a set to practice:", sets)
 
-if set_name and candidate_name:
-    df = load_questions(set_name)
-    num_questions = len(df)
-    time_limit = num_questions / 5 * 60  # Time limit in seconds
+if set_name and candidate_name and candidate_password:
+    # Check if the entered name and password match
+    if check_credentials(candidate_name, candidate_password):
+        df = load_questions(set_name)
+        num_questions = len(df)
+        time_limit = num_questions / 5 * 60  # Time limit in seconds
 
-    st.write(f"Total questions: {num_questions}")
-    st.write(f"Time limit: {time_limit / 60:.2f} minutes")
+        st.write(f"Total questions: {num_questions}")
+        st.write(f"Time limit: {time_limit / 60:.2f} minutes")
 
-    # Initialize timer
-    if "start_time" not in st.session_state:
-        st.session_state.start_time = time.time()
+        # Initialize timer
+        if "start_time" not in st.session_state:
+            st.session_state.start_time = time.time()
 
-    # Form to display questions and options
-    with st.form("questions_form"):
-        answers = {}
-        for i, row in df.iterrows():
-            question = row['question']
-            options = [row['option1'], row['option2'], row['option3'], row['option4']]
-            st.write(f"Q{i+1}: {question}")
-            answers[row['question_no']] = st.radio(f"Options for Q{i+1}", options)
+        # Form to display questions and options
+        with st.form("questions_form"):
+            answers = {}
+            for i, row in df.iterrows():
+                question = row['question']
+                options = [row['option1'], row['option2'], row['option3'], row['option4']]
+                st.write(f"Q{i+1}: {question}")
+                answers[row['question_no']] = st.radio(f"Options for Q{i+1}", options)
 
-        submit_button = st.form_submit_button("Submit")
+            submit_button = st.form_submit_button("Submit")
 
-        if submit_button:
-            # Calculate time taken
-            end_time = time.time()
-            time_taken = end_time - st.session_state.start_time
+            if submit_button:
+                # Calculate time taken
+                end_time = time.time()
+                time_taken = end_time - st.session_state.start_time
 
-            # Calculate score and show results
-            score, results = calculate_results(df, answers)
-            st.write(f"Your score: {score}/{num_questions}")
-            st.write(f"Time taken: {time_taken / 60:.2f} minutes")
+                # Calculate score and show results
+                score, results = calculate_results(df, answers)
+                st.write(f"Your score: {score}/{num_questions}")
+                st.write(f"Time taken: {time_taken / 60:.2f} minutes")
 
-            if results:
-                st.write("Questions you got wrong:")
-                for question, user_answer, correct_answer in results:
-                    st.write(f"Question: {question}")
-                    st.write(f"Your answer: {user_answer}")
-                    st.write(f"Correct answer: {correct_answer}")
+                if results:
+                    st.write("Questions you got wrong:")
+                    for question, user_answer, correct_answer in results:
+                        st.write(f"Question: {question}")
+                        st.write(f"Your answer: {user_answer}")
+                        st.write(f"Correct answer: {correct_answer}")
 
-            # Save results to the candidate's CSV file
-            save_results(candidate_name, set_name, score, num_questions, time_taken)
+                # Save results to the candidate's CSV file
+                save_results(candidate_name, set_name, score, num_questions, time_taken)
+    else:
+        st.write("Invalid name or password. Please try again.")
 
 else:
-    st.write("Please enter your name and select a set to start practicing.")
+    st.write("Please enter your name, password, and select a set to start practicing.")
