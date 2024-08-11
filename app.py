@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Custom CSS to style the buttons and position them horizontally at the top
+# Custom CSS to style the buttons, position them horizontally at the top, and add colors
 st.markdown("""
     <style>
     .button-container {
@@ -15,17 +15,32 @@ st.markdown("""
         z-index: 1000;
     }
     .button {
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
         padding: 10px 20px;
         border-radius: 5px;
         text-align: center;
         font-size: 16px;
         cursor: pointer;
-        width: 100px;
+        width: 120px;
+        color: white;
+        text-decoration: none;
+    }
+    .home-button {
+        background-color: #007bff; /* Blue */
+    }
+    .explore-button {
+        background-color: #28a745; /* Green */
+    }
+    .categories-button {
+        background-color: #ffc107; /* Yellow */
+    }
+    .account-button {
+        background-color: #17a2b8; /* Teal */
+    }
+    .cart-button {
+        background-color: #dc3545; /* Red */
     }
     .button:hover {
-        background-color: #e0e0e0;
+        opacity: 0.8;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -36,20 +51,33 @@ if 'page' not in st.session_state:
 
 # Create the button container
 st.markdown('<div class="button-container">', unsafe_allow_html=True)
-if st.button('Home'):
+
+# Home Button
+if st.markdown('<a href="#" class="button home-button" onclick="javascript:window.location.reload();">Home</a>', unsafe_allow_html=True):
     st.session_state['page'] = 'Home'
-if st.button('Explore'):
+
+# Explore Button
+if st.markdown('<a href="#" class="button explore-button" onclick="javascript:window.location.reload();">Explore</a>', unsafe_allow_html=True):
     st.session_state['page'] = 'Explore'
-if st.button('Categories'):
+
+# Categories Button
+if st.markdown('<a href="#" class="button categories-button" onclick="javascript:window.location.reload();">Categories</a>', unsafe_allow_html=True):
     st.session_state['page'] = 'Categories'
-if st.button('Account'):
+
+# Account Button
+if st.markdown('<a href="#" class="button account-button" onclick="javascript:window.location.reload();">Account</a>', unsafe_allow_html=True):
     st.session_state['page'] = 'Account'
-if st.button('Cart'):
+
+# Cart Button
+if st.markdown('<a href="#" class="button cart-button" onclick="javascript:window.location.reload();">Cart</a>', unsafe_allow_html=True):
     st.session_state['page'] = 'Cart'
+
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Spacer for the fixed position buttons
+st.write("\n\n\n\n\n")  # Add space below the button container
+
 # Display content based on the page selected
-st.write("\n\n")  # Add some space below the button container
 if st.session_state['page'] == 'Home':
     st.header("Welcome to the Home Page")
     st.write("Here is the introduction and information about the website.")
