@@ -69,6 +69,11 @@ st.markdown('</div>', unsafe_allow_html=True)
 if st.session_state['page'] == 'Home':
     st.header("Welcome to the Home Page")
     st.write("Here is the introduction and information about the website.")
+    
+    # Display an image from GitHub
+    image_url = "https://raw.githubusercontent.com/your-username/your-repository/main/your-image.png"
+    st.image(image_url, caption="This is an example image.", use_column_width=True)
+
 elif st.session_state['page'] == 'Explore':
     st.header("Explore Page")
     st.write("Explore various features and options.")
