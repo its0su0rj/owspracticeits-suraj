@@ -39,22 +39,15 @@ st.markdown("""
 if 'page' not in st.session_state:
     st.session_state['page'] = 'Library'
 
-if 'image_index' not in st.session_state:
-    st.session_state['image_index'] = 0
-
-# Function to reset the image index
-def reset_image_index():
-    st.session_state['image_index'] = 0
-
 # Create the button container
 st.markdown('<div class="button-container">', unsafe_allow_html=True)
-if st.button('📚 Library', on_click=reset_image_index):
+if st.button('📚 Library'):
     st.session_state['page'] = 'Library'
-if st.button('👧 Girls', on_click=reset_image_index):
+if st.button('👧 Girls'):
     st.session_state['page'] = 'Girls'
-if st.button('👦 Boys', on_click=reset_image_index):
+if st.button('👦 Boys'):
     st.session_state['page'] = 'Boys'
-if st.button('ℹ️ About', on_click=reset_image_index):
+if st.button('ℹ️ About'):
     st.session_state['page'] = 'About'
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -73,14 +66,9 @@ if st.session_state['page'] == 'Library':
         "https://via.placeholder.com/800x400?text=Library+Image+3"
     ]
     
-    # Display current image
-    st.image(library_images[st.session_state['image_index']], use_column_width=True)
-    
-    # Buttons to navigate images
-    if st.button('Previous'):
-        st.session_state['image_index'] = (st.session_state['image_index'] - 1) % len(library_images)
-    if st.button('Next'):
-        st.session_state['image_index'] = (st.session_state['image_index'] + 1) % len(library_images)
+    # Display all images
+    for image_url in library_images:
+        st.image(image_url, use_column_width=True)
     
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
@@ -94,14 +82,9 @@ elif st.session_state['page'] == 'Girls':
         "https://via.placeholder.com/800x400?text=Girls+Image+3"
     ]
     
-    # Display current image
-    st.image(girls_images[st.session_state['image_index']], use_column_width=True)
-    
-    # Buttons to navigate images
-    if st.button('Previous'):
-        st.session_state['image_index'] = (st.session_state['image_index'] - 1) % len(girls_images)
-    if st.button('Next'):
-        st.session_state['image_index'] = (st.session_state['image_index'] + 1) % len(girls_images)
+    # Display all images
+    for image_url in girls_images:
+        st.image(image_url, use_column_width=True)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
@@ -124,14 +107,9 @@ elif st.session_state['page'] == 'Boys':
         "https://via.placeholder.com/800x400?text=Boys+Image+3"
     ]
     
-    # Display current image
-    st.image(boys_images[st.session_state['image_index']], use_column_width=True)
-    
-    # Buttons to navigate images
-    if st.button('Previous'):
-        st.session_state['image_index'] = (st.session_state['image_index'] - 1) % len(boys_images)
-    if st.button('Next'):
-        st.session_state['image_index'] = (st.session_state['image_index'] + 1) % len(boys_images)
+    # Display all images
+    for image_url in boys_images:
+        st.image(image_url, use_column_width=True)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
