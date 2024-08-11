@@ -109,25 +109,23 @@ def generate_carousel(images):
         <script>
         let index = 0;
         const images = document.querySelectorAll('.carousel-images img');
-        
+
         function showSlide(i) {
             if (i >= images.length) index = 0;
             if (i < 0) index = images.length - 1;
-            images.forEach((img) => {
-                img.style.transform = `translateX(-${index * 100}%)`;
-            });
+            document.querySelector('.carousel-images').style.transform = `translateX(-${index * 100}%)`;
         }
-        
+
         function prevSlide() {
             index--;
             showSlide(index);
         }
-        
+
         function nextSlide() {
             index++;
             showSlide(index);
         }
-        
+
         document.addEventListener('DOMContentLoaded', () => {
             showSlide(index);
         });
