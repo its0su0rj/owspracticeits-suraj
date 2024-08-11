@@ -1,6 +1,10 @@
 import streamlit as st
 
-# Custom CSS to style the buttons, position them horizontally at the top, and add colors
+# Initialize session state to store which button was last clicked
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'Home'
+
+# Custom CSS to style the buttons and position them horizontally at the top
 st.markdown("""
     <style>
     .button-container {
@@ -14,15 +18,15 @@ st.markdown("""
         left: 0;
         z-index: 1000;
     }
-    .button {
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-align: center;
-        font-size: 16px;
-        cursor: pointer;
+    .stButton > button {
+        margin: 0px 5px;
         width: 120px;
+        height: 40px;
         color: white;
-        text-decoration: none;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
     }
     .home-button {
         background-color: #007bff; /* Blue */
@@ -32,6 +36,7 @@ st.markdown("""
     }
     .categories-button {
         background-color: #ffc107; /* Yellow */
+        color: black;
     }
     .account-button {
         background-color: #17a2b8; /* Teal */
@@ -39,38 +44,38 @@ st.markdown("""
     .cart-button {
         background-color: #dc3545; /* Red */
     }
-    .button:hover {
-        opacity: 0.8;
-    }
     </style>
 """, unsafe_allow_html=True)
-
-# Initialize session state to store which button was last clicked
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'Home'
 
 # Create the button container
 st.markdown('<div class="button-container">', unsafe_allow_html=True)
 
-# Home Button
-if st.markdown('<a href="#" class="button home-button" onclick="javascript:window.location.reload();">Home</a>', unsafe_allow_html=True):
-    st.session_state['page'] = 'Home'
+col1, col2, col3, col4, col5 = st.columns(5)
 
-# Explore Button
-if st.markdown('<a href="#" class="button explore-button" onclick="javascript:window.location.reload();">Explore</a>', unsafe_allow_html=True):
-    st.session_state['page'] = 'Explore'
+with col1:
+    if st.button('Home'):
+        st.session_state['page'] = 'Home'
+    st.markdown('<style>div.stButton > button:first-child {background-color: #007bff;}</style>', unsafe_allow_html=True)
 
-# Categories Button
-if st.markdown('<a href="#" class="button categories-button" onclick="javascript:window.location.reload();">Categories</a>', unsafe_allow_html=True):
-    st.session_state['page'] = 'Categories'
+with col2:
+    if st.button('Explore'):
+        st.session_state['page'] = 'Explore'
+    st.markdown('<style>div.stButton > button:first-child {background-color: #28a745;}</style>', unsafe_allow_html=True)
 
-# Account Button
-if st.markdown('<a href="#" class="button account-button" onclick="javascript:window.location.reload();">Account</a>', unsafe_allow_html=True):
-    st.session_state['page'] = 'Account'
+with col3:
+    if st.button('Categories'):
+        st.session_state['page'] = 'Categories'
+    st.markdown('<style>div.stButton > button:first-child {background-color: #ffc107; color: black;}</style>', unsafe_allow_html=True)
 
-# Cart Button
-if st.markdown('<a href="#" class="button cart-button" onclick="javascript:window.location.reload();">Cart</a>', unsafe_allow_html=True):
-    st.session_state['page'] = 'Cart'
+with col4:
+    if st.button('Account'):
+        st.session_state['page'] = 'Account'
+    st.markdown('<style>div.stButton > button:first-child {background-color: #17a2b8;}</style>', unsafe_allow_html=True)
+
+with col5:
+    if st.button('Cart'):
+        st.session_state['page'] = 'Cart'
+    st.markdown('<style>div.stButton > button:first-child {background-color: #dc3545;}</style>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
