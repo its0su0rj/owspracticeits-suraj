@@ -98,66 +98,46 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Add some space below the button container
 st.write("\n\n") 
 
+# Function to create the carousel
+def create_carousel(images):
+    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
+    st.markdown('<button class="carousel-button prev" onclick="document.querySelector(\'.carousel\').scrollLeft -= 300;">&#10094;</button>', unsafe_allow_html=True)
+    st.markdown('<div class="carousel">', unsafe_allow_html=True)
+    
+    for image_url in images:
+        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<button class="carousel-button next" onclick="document.querySelector(\'.carousel\').scrollLeft += 300;">&#10095;</button>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # Display content based on the page selected
 if st.session_state['page'] == 'Library':
     st.header("Welcome to the Library")
     st.write("This is a brief introduction about the library.")
     
-    # List of images
     library_images = [
         "https://via.placeholder.com/800x400?text=Library+Image+1",
         "https://via.placeholder.com/800x400?text=Library+Image+2",
         "https://via.placeholder.com/800x400?text=Library+Image+3"
     ]
     
-    # Create carousel container
-    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
-    
-    # Carousel images with navigation buttons
-    st.markdown('<button class="carousel-button prev" onclick="document.querySelector(\'.carousel\').scrollLeft -= 300;">&#10094;</button>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="carousel">', unsafe_allow_html=True)
-    
-    for image_url in library_images:
-        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('<button class="carousel-button next" onclick="document.querySelector(\'.carousel\').scrollLeft += 300;">&#10095;</button>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    create_carousel(library_images)
     
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
     
-    # List of images
     girls_images = [
         "https://via.placeholder.com/800x400?text=Girls+Image+1",
         "https://via.placeholder.com/800x400?text=Girls+Image+2",
         "https://via.placeholder.com/800x400?text=Girls+Image+3"
     ]
     
-    # Create carousel container
-    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
-    
-    # Carousel images with navigation buttons
-    st.markdown('<button class="carousel-button prev" onclick="document.querySelector(\'.carousel\').scrollLeft -= 300;">&#10094;</button>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="carousel">', unsafe_allow_html=True)
-    
-    for image_url in girls_images:
-        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('<button class="carousel-button next" onclick="document.querySelector(\'.carousel\').scrollLeft += 300;">&#10095;</button>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    create_carousel(girls_images)
     
     if st.button('Check Available Slots'):
-        # Create a DataFrame to display the available slots
         data = {
             'Seat No': [f'Seat {i}' for i in range(1, 13)],
             'Slot 1': ['Available']*12,
@@ -170,32 +150,15 @@ elif st.session_state['page'] == 'Girls':
 elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
     
-    # List of images
     boys_images = [
         "https://via.placeholder.com/800x400?text=Boys+Image+1",
         "https://via.placeholder.com/800x400?text=Boys+Image+2",
         "https://via.placeholder.com/800x400?text=Boys+Image+3"
     ]
     
-    # Create carousel container
-    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
-    
-    # Carousel images with navigation buttons
-    st.markdown('<button class="carousel-button prev" onclick="document.querySelector(\'.carousel\').scrollLeft -= 300;">&#10094;</button>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="carousel">', unsafe_allow_html=True)
-    
-    for image_url in boys_images:
-        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('<button class="carousel-button next" onclick="document.querySelector(\'.carousel\').scrollLeft += 300;">&#10095;</button>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    create_carousel(boys_images)
     
     if st.button('Check Available Slots'):
-        # Create a DataFrame to display the available slots
         data = {
             'Seat No': [f'Seat {i}' for i in range(1, 13)],
             'Slot 1': ['Available']*12,
