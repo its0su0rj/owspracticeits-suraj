@@ -71,7 +71,7 @@ if st.session_state['page'] == 'Home':
     st.write("Here is the introduction and information about the website.")
     
     # Display an image from GitHub
-    image_url = "https://raw.githubusercontent.com/your-username/your-repository/main/your-image.png"
+    image_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/daabe291ff4d13b63a0df065dd51ec2e9c3fac40/images.png"
     st.image(image_url, caption="This is an example image.", use_column_width=True)
 
 elif st.session_state['page'] == 'Explore':
