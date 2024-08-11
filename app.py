@@ -37,14 +37,14 @@ st.markdown("""
         width: 100%;
         max-width: 700px;
         margin: auto;
+        overflow: hidden;
     }
     .carousel-images {
         display: flex;
-        overflow: hidden;
+        transition: transform 0.5s ease;
     }
     .carousel-images img {
         width: 100%;
-        transition: transform 0.5s ease;
     }
     .carousel-controls {
         position: absolute;
@@ -113,7 +113,7 @@ def generate_carousel(images):
         function showSlide(i) {
             if (i >= images.length) index = 0;
             if (i < 0) index = images.length - 1;
-            images.forEach((img, idx) => {
+            images.forEach((img) => {
                 img.style.transform = `translateX(-${index * 100}%)`;
             });
         }
