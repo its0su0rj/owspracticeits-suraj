@@ -32,6 +32,29 @@ st.markdown("""
         font-size: 20px;
         margin-right: 8px;
     }
+
+    .carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .carousel img {
+        width: 100%;
+        height: auto;
+        margin: 0 10px;
+        scroll-snap-align: center;
+    }
+
+    .carousel-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .carousel::-webkit-scrollbar {
+        display: none;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -66,9 +89,11 @@ if st.session_state['page'] == 'Library':
         "https://via.placeholder.com/800x400?text=Library+Image+3"
     ]
     
-    # Image carousel
-    selected_image = st.selectbox("Select an image to view:", list(range(1, len(library_images) + 1)))
-    st.image(library_images[selected_image - 1], use_column_width=True)
+    # Create carousel container
+    st.markdown('<div class="carousel-container"><div class="carousel">', unsafe_allow_html=True)
+    for image_url in library_images:
+        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
     
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
@@ -82,9 +107,11 @@ elif st.session_state['page'] == 'Girls':
         "https://via.placeholder.com/800x400?text=Girls+Image+3"
     ]
     
-    # Image carousel
-    selected_image = st.selectbox("Select an image to view:", list(range(1, len(girls_images) + 1)))
-    st.image(girls_images[selected_image - 1], use_column_width=True)
+    # Create carousel container
+    st.markdown('<div class="carousel-container"><div class="carousel">', unsafe_allow_html=True)
+    for image_url in girls_images:
+        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
@@ -107,9 +134,11 @@ elif st.session_state['page'] == 'Boys':
         "https://via.placeholder.com/800x400?text=Boys+Image+3"
     ]
     
-    # Image carousel
-    selected_image = st.selectbox("Select an image to view:", list(range(1, len(boys_images) + 1)))
-    st.image(boys_images[selected_image - 1], use_column_width=True)
+    # Create carousel container
+    st.markdown('<div class="carousel-container"><div class="carousel">', unsafe_allow_html=True)
+    for image_url in boys_images:
+        st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
