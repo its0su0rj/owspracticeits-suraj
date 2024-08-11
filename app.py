@@ -33,27 +33,49 @@ st.markdown("""
         margin-right: 8px;
     }
 
+    .carousel-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
     .carousel {
         display: flex;
-        overflow-x: auto;
+        overflow-x: scroll;
         scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        scroll-snap-type: x mandatory;
     }
 
     .carousel img {
         width: 100%;
         height: auto;
-        margin: 0 10px;
+        margin-right: 10px;
         scroll-snap-align: center;
     }
 
-    .carousel-container {
-        max-width: 800px;
-        margin: 0 auto;
+    .carousel::-webkit-scrollbar {
+        display: none; /* Hide the scrollbar */
     }
 
-    .carousel::-webkit-scrollbar {
-        display: none;
+    .prev, .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .prev {
+        left: 0;
+    }
+
+    .next {
+        right: 0;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -90,10 +112,21 @@ if st.session_state['page'] == 'Library':
     ]
     
     # Create carousel container
-    st.markdown('<div class="carousel-container"><div class="carousel">', unsafe_allow_html=True)
+    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
+    
+    # Carousel images with navigation buttons
+    st.markdown("""
+        <button class="prev" onclick="document.querySelector('.carousel').scrollLeft -= 300;">&#10094;</button>
+        <div class="carousel">""", unsafe_allow_html=True)
+    
     for image_url in library_images:
         st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+        </div>
+        <button class="next" onclick="document.querySelector('.carousel').scrollLeft += 300;">&#10095;</button>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
@@ -108,10 +141,21 @@ elif st.session_state['page'] == 'Girls':
     ]
     
     # Create carousel container
-    st.markdown('<div class="carousel-container"><div class="carousel">', unsafe_allow_html=True)
+    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
+    
+    # Carousel images with navigation buttons
+    st.markdown("""
+        <button class="prev" onclick="document.querySelector('.carousel').scrollLeft -= 300;">&#10094;</button>
+        <div class="carousel">""", unsafe_allow_html=True)
+    
     for image_url in girls_images:
         st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+        </div>
+        <button class="next" onclick="document.querySelector('.carousel').scrollLeft += 300;">&#10095;</button>
+        </div>
+    """, unsafe_allow_html=True)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
@@ -135,10 +179,21 @@ elif st.session_state['page'] == 'Boys':
     ]
     
     # Create carousel container
-    st.markdown('<div class="carousel-container"><div class="carousel">', unsafe_allow_html=True)
+    st.markdown('<div class="carousel-container">', unsafe_allow_html=True)
+    
+    # Carousel images with navigation buttons
+    st.markdown("""
+        <button class="prev" onclick="document.querySelector('.carousel').scrollLeft -= 300;">&#10094;</button>
+        <div class="carousel">""", unsafe_allow_html=True)
+    
     for image_url in boys_images:
         st.markdown(f'<img src="{image_url}">', unsafe_allow_html=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+        </div>
+        <button class="next" onclick="document.querySelector('.carousel').scrollLeft += 300;">&#10095;</button>
+        </div>
+    """, unsafe_allow_html=True)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
