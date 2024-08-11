@@ -32,6 +32,38 @@ st.markdown("""
         font-size: 20px;
         margin-right: 8px;
     }
+    .carousel {
+        position: relative;
+        width: 100%;
+        max-width: 700px;
+        margin: auto;
+    }
+    .carousel-images {
+        display: flex;
+        overflow: hidden;
+    }
+    .carousel-images img {
+        width: 100%;
+        transition: transform 0.5s ease;
+    }
+    .carousel-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+    }
+    .carousel-button {
+        background-color: rgba(0,0,0,0.5);
+        border: none;
+        color: white;
+        padding: 10px;
+        cursor: pointer;
+    }
+    .carousel-button:hover {
+        background-color: rgba(0,0,0,0.8);
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -39,15 +71,22 @@ st.markdown("""
 if 'page' not in st.session_state:
     st.session_state['page'] = 'Library'
 
+if 'image_index' not in st.session_state:
+    st.session_state['image_index'] = 0
+
+# Function to reset the image index
+def reset_image_index():
+    st.session_state['image_index'] = 0
+
 # Create the button container
 st.markdown('<div class="button-container">', unsafe_allow_html=True)
-if st.button('📚 Library'):
+if st.button('📚 Library', on_click=reset_image_index):
     st.session_state['page'] = 'Library'
-if st.button('👧 Girls'):
+if st.button('👧 Girls', on_click=reset_image_index):
     st.session_state['page'] = 'Girls'
-if st.button('👦 Boys'):
+if st.button('👦 Boys', on_click=reset_image_index):
     st.session_state['page'] = 'Boys'
-if st.button('ℹ️ About'):
+if st.button('ℹ️ About', on_click=reset_image_index):
     st.session_state['page'] = 'About'
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -66,9 +105,46 @@ if st.session_state['page'] == 'Library':
         "https://via.placeholder.com/800x400?text=Library+Image+3"
     ]
     
-    # Display all images
-    for image_url in library_images:
-        st.image(image_url, use_column_width=True)
+    # Display image carousel
+    st.markdown("""
+        <div class="carousel">
+            <div class="carousel-images">
+                <img src="{}" alt="Library Image 1">
+                <img src="{}" alt="Library Image 2">
+                <img src="{}" alt="Library Image 3">
+            </div>
+            <div class="carousel-controls">
+                <button class="carousel-button" onclick="prevSlide()">&#10094;</button>
+                <button class="carousel-button" onclick="nextSlide()">&#10095;</button>
+            </div>
+        </div>
+        <script>
+        let index = 0;
+        const images = document.querySelectorAll('.carousel-images img');
+        
+        function showSlide(i) {
+            if (i >= images.length) index = 0;
+            if (i < 0) index = images.length - 1;
+            images.forEach((img, idx) => {
+                img.style.transform = `translateX(-${index * 100}%)`;
+            });
+        }
+        
+        function prevSlide() {
+            index--;
+            showSlide(index);
+        }
+        
+        function nextSlide() {
+            index++;
+            showSlide(index);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            showSlide(index);
+        });
+        </script>
+    """.format(*library_images), unsafe_allow_html=True)
     
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
@@ -82,10 +158,47 @@ elif st.session_state['page'] == 'Girls':
         "https://via.placeholder.com/800x400?text=Girls+Image+3"
     ]
     
-    # Display all images
-    for image_url in girls_images:
-        st.image(image_url, use_column_width=True)
-    
+    # Display image carousel
+    st.markdown("""
+        <div class="carousel">
+            <div class="carousel-images">
+                <img src="{}" alt="Girls Image 1">
+                <img src="{}" alt="Girls Image 2">
+                <img src="{}" alt="Girls Image 3">
+            </div>
+            <div class="carousel-controls">
+                <button class="carousel-button" onclick="prevSlide()">&#10094;</button>
+                <button class="carousel-button" onclick="nextSlide()">&#10095;</button>
+            </div>
+        </div>
+        <script>
+        let index = 0;
+        const images = document.querySelectorAll('.carousel-images img');
+        
+        function showSlide(i) {
+            if (i >= images.length) index = 0;
+            if (i < 0) index = images.length - 1;
+            images.forEach((img, idx) => {
+                img.style.transform = `translateX(-${index * 100}%)`;
+            });
+        }
+        
+        function prevSlide() {
+            index--;
+            showSlide(index);
+        }
+        
+        function nextSlide() {
+            index++;
+            showSlide(index);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            showSlide(index);
+        });
+        </script>
+    """.format(*girls_images), unsafe_allow_html=True)
+
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
         data = {
@@ -107,20 +220,46 @@ elif st.session_state['page'] == 'Boys':
         "https://via.placeholder.com/800x400?text=Boys+Image+3"
     ]
     
-    # Display all images
-    for image_url in boys_images:
-        st.image(image_url, use_column_width=True)
-    
-    if st.button('Check Available Slots'):
-        # Create a DataFrame to display the available slots
-        data = {
-            'Seat No': [f'Seat {i}' for i in range(1, 13)],
-            'Slot 1': ['Available']*12,
-            'Slot 2': ['Occupied']*12,
-            'Slot 3': ['Available']*12
+    # Display image carousel
+    st.markdown("""
+        <div class="carousel">
+            <div class="carousel-images">
+                <img src="{}" alt="Boys Image 1">
+                <img src="{}" alt="Boys Image 2">
+                <img src="{}" alt="Boys Image 3">
+            </div>
+            <div class="carousel-controls">
+                <button class="carousel-button" onclick="prevSlide()">&#10094;</button>
+                <button class="carousel-button" onclick="nextSlide()">&#10095;</button>
+            </div>
+        </div>
+        <script>
+        let index = 0;
+        const images = document.querySelectorAll('.carousel-images img');
+        
+        function showSlide(i) {
+            if (i >= images.length) index = 0;
+            if (i < 0) index = images.length - 1;
+            images.forEach((img, idx) => {
+                img.style.transform = `translateX(-${index * 100}%)`;
+            });
         }
-        df = pd.DataFrame(data)
-        st.table(df)
+        
+        function prevSlide() {
+            index--;
+            showSlide(index);
+        }
+        
+        function nextSlide() {
+            index++;
+            showSlide(index);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            showSlide(index);
+        });
+        </script>
+    """.format(*boys_images), unsafe_allow_html=True)
 
 elif st.session_state['page'] == 'About':
     st.header("About")
