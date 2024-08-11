@@ -1,14 +1,5 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
-
-# Initialize session state to store which button was last clicked
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'Library'
-
-# Function to reset the image index
-def reset_image_index():
-    st.session_state['image_index'] = 0
 
 # Custom CSS to style the buttons and position them horizontally at the top
 st.markdown("""
@@ -44,6 +35,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Initialize session state to store which button was last clicked
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'Library'
+
+if 'image_index' not in st.session_state:
+    st.session_state['image_index'] = 0
+
+# Function to reset the image index
+def reset_image_index():
+    st.session_state['image_index'] = 0
+
 # Create the button container
 st.markdown('<div class="button-container">', unsafe_allow_html=True)
 if st.button('📚 Library', on_click=reset_image_index):
@@ -59,44 +61,47 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Add some space below the button container
 st.write("\n\n") 
 
-# Carousel component
-imageCarouselComponent = components.declare_component("image-carousel-component", path="frontend/public")
-
-# Page-specific content
+# Display content based on the page selected
 if st.session_state['page'] == 'Library':
     st.header("Welcome to the Library")
     st.write("This is a brief introduction about the library.")
     
-    # List of images for Library
+    # List of images
     library_images = [
         "https://via.placeholder.com/800x400?text=Library+Image+1",
         "https://via.placeholder.com/800x400?text=Library+Image+2",
         "https://via.placeholder.com/800x400?text=Library+Image+3"
     ]
     
-    # Display the image carousel
-    selectedImageUrl = imageCarouselComponent(imageUrls=library_images, height=400)
+    # Display current image
+    st.image(library_images[st.session_state['image_index']], width=700)
     
-    if selectedImageUrl:
-        st.image(selectedImageUrl, width=700)
+    # Buttons to navigate images
+    if st.button('Previous'):
+        st.session_state['image_index'] = (st.session_state['image_index'] - 1) % len(library_images)
+    if st.button('Next'):
+        st.session_state['image_index'] = (st.session_state['image_index'] + 1) % len(library_images)
     
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
     
-    # List of images for Girls
+    # List of images
     girls_images = [
         "https://via.placeholder.com/800x400?text=Girls+Image+1",
         "https://via.placeholder.com/800x400?text=Girls+Image+2",
         "https://via.placeholder.com/800x400?text=Girls+Image+3"
     ]
     
-    # Display the image carousel
-    selectedImageUrl = imageCarouselComponent(imageUrls=girls_images, height=400)
+    # Display current image
+    st.image(girls_images[st.session_state['image_index']], width=700)
     
-    if selectedImageUrl:
-        st.image(selectedImageUrl, width=700)
+    # Buttons to navigate images
+    if st.button('Previous'):
+        st.session_state['image_index'] = (st.session_state['image_index'] - 1) % len(girls_images)
+    if st.button('Next'):
+        st.session_state['image_index'] = (st.session_state['image_index'] + 1) % len(girls_images)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
@@ -112,18 +117,21 @@ elif st.session_state['page'] == 'Girls':
 elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
     
-    # List of images for Boys
+    # List of images
     boys_images = [
         "https://via.placeholder.com/800x400?text=Boys+Image+1",
         "https://via.placeholder.com/800x400?text=Boys+Image+2",
         "https://via.placeholder.com/800x400?text=Boys+Image+3"
     ]
     
-    # Display the image carousel
-    selectedImageUrl = imageCarouselComponent(imageUrls=boys_images, height=400)
+    # Display current image
+    st.image(boys_images[st.session_state['image_index']], width=700)
     
-    if selectedImageUrl:
-        st.image(selectedImageUrl, width=700)
+    # Buttons to navigate images
+    if st.button('Previous'):
+        st.session_state['image_index'] = (st.session_state['image_index'] - 1) % len(boys_images)
+    if st.button('Next'):
+        st.session_state['image_index'] = (st.session_state['image_index'] + 1) % len(boys_images)
     
     if st.button('Check Available Slots'):
         # Create a DataFrame to display the available slots
@@ -142,4 +150,3 @@ elif st.session_state['page'] == 'About':
     st.write("Contact us at:")
     st.write("**Phone:** +1234567890")
     st.write("**Email:** info@example.com")
-
