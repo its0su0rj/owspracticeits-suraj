@@ -74,7 +74,7 @@ if st.session_state['page'] == 'Library':
     ]
     
     # Display current image
-    st.image(library_images[st.session_state['image_index']], width=700)
+    st.image(library_images[st.session_state['image_index']], use_column_width=True)
     
     # Buttons to navigate images
     if st.button('Previous'):
@@ -95,7 +95,7 @@ elif st.session_state['page'] == 'Girls':
     ]
     
     # Display current image
-    st.image(girls_images[st.session_state['image_index']], width=700)
+    st.image(girls_images[st.session_state['image_index']], use_column_width=True)
     
     # Buttons to navigate images
     if st.button('Previous'):
@@ -125,7 +125,7 @@ elif st.session_state['page'] == 'Boys':
     ]
     
     # Display current image
-    st.image(boys_images[st.session_state['image_index']], width=700)
+    st.image(boys_images[st.session_state['image_index']], use_column_width=True)
     
     # Buttons to navigate images
     if st.button('Previous'):
@@ -146,7 +146,7 @@ elif st.session_state['page'] == 'Boys':
 
 elif st.session_state['page'] == 'About':
     st.header("About")
-    st.image("https://via.placeholder.com/800x400?text=Fee+Structure", width=700)
+    st.image("https://via.placeholder.com/800x400?text=Fee+Structure", use_column_width=True)
     st.write("Contact us at:")
     st.write("**Phone:** +1234567890")
     st.write("**Email:** info@example.com")
