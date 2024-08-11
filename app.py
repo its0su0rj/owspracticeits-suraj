@@ -20,32 +20,23 @@ st.markdown("""
     }
     .stButton > button {
         margin: 0px 5px;
-        width: 120px;
-        height: 40px;
-        color: white;
+        width: 100%;
+        height: 50px;
+        color: #333;
         border-radius: 5px;
         border: none;
         cursor: pointer;
         font-size: 16px;
+        background-color: transparent;
     }
-    .home-button {
-        background-color: #007bff; /* Blue */
-    }
-    .explore-button {
-        background-color: #28a745; /* Green */
-    }
-    .categories-button {
-        background-color: #ffc107; /* Yellow */
-        color: black;
-    }
-    .account-button {
-        background-color: #17a2b8; /* Teal */
-    }
-    .cart-button {
-        background-color: #dc3545; /* Red */
+    .stButton > button:hover {
+        background-color: #e0e0e0;
     }
     </style>
 """, unsafe_allow_html=True)
+
+# Spacer to push content below the fixed header
+st.write("<br><br><br><br>", unsafe_allow_html=True)
 
 # Create the button container
 st.markdown('<div class="button-container">', unsafe_allow_html=True)
@@ -53,34 +44,26 @@ st.markdown('<div class="button-container">', unsafe_allow_html=True)
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
-    if st.button('Home'):
+    if st.button('🏠 Home'):
         st.session_state['page'] = 'Home'
-    st.markdown('<style>div.stButton > button:first-child {background-color: #007bff;}</style>', unsafe_allow_html=True)
 
 with col2:
-    if st.button('Explore'):
+    if st.button('🧭 Explore'):
         st.session_state['page'] = 'Explore'
-    st.markdown('<style>div.stButton > button:first-child {background-color: #28a745;}</style>', unsafe_allow_html=True)
 
 with col3:
-    if st.button('Categories'):
+    if st.button('🗂️ Categories'):
         st.session_state['page'] = 'Categories'
-    st.markdown('<style>div.stButton > button:first-child {background-color: #ffc107; color: black;}</style>', unsafe_allow_html=True)
 
 with col4:
-    if st.button('Account'):
+    if st.button('👤 Account'):
         st.session_state['page'] = 'Account'
-    st.markdown('<style>div.stButton > button:first-child {background-color: #17a2b8;}</style>', unsafe_allow_html=True)
 
 with col5:
-    if st.button('Cart'):
+    if st.button('🛒 Cart'):
         st.session_state['page'] = 'Cart'
-    st.markdown('<style>div.stButton > button:first-child {background-color: #dc3545;}</style>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
-
-# Spacer for the fixed position buttons
-st.write("\n\n\n\n\n")  # Add space below the button container
 
 # Display content based on the page selected
 if st.session_state['page'] == 'Home':
