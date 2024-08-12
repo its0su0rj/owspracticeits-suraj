@@ -2,23 +2,23 @@ import streamlit as st
 import pandas as pd
 import os
 
-# List of images for each section
+# List of images for each section (use the local file paths)
 library_images = [
-    "https://via.placeholder.com/800x400?text=Library+Image+1",
-    "https://via.placeholder.com/800x400?text=Library+Image+2",
-    "https://github.com/its0su0rj/owspracticeits-suraj/blob/341119cab8d105b49b1d073dc2e97f1fe846c030/IMG-20240812-WA0001.jpg"
+    "images/library_image_1.jpg",
+    "images/library_image_2.jpg",
+    "images/IMG-20240812-WA0001.jpg"
 ]
 
 girls_images = [
-    "https://via.placeholder.com/800x400?text=Girls+Image+1",
-    "https://via.placeholder.com/800x400?text=Girls+Image+2",
-    "https://via.placeholder.com/800x400?text=Girls+Image+3"
+    "images/girls_image_1.jpg",
+    "images/girls_image_2.jpg",
+    "images/girls_image_3.jpg"
 ]
 
 boys_images = [
-    "https://via.placeholder.com/800x400?text=Boys+Image+1",
-    "https://via.placeholder.com/800x400?text=Boys+Image+2",
-    "https://via.placeholder.com/800x400?text=Boys+Image+3"
+    "images/boys_image_1.jpg",
+    "images/boys_image_2.jpg",
+    "images/boys_image_3.jpg"
 ]
 
 # Custom CSS for buttons and carousel
@@ -145,7 +145,6 @@ if st.session_state['page'] == 'Library':
 
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
-    #create_carousel(girls_images)
     if st.button('Check Available Slots'):
         try:
             df = pd.read_csv(os.path.join('girls_slots.csv'))
@@ -154,27 +153,8 @@ elif st.session_state['page'] == 'Girls':
             st.error(f"Error loading the CSV file: {e}")
     create_carousel(girls_images)
 
-    
-    #if st.button('Check Available Slots'):
-     #   # URL of the CSV file on GitHub for the Girls section
-      #  csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/c0d780332ca385c8879d8ac813727b0b990b9e56/slots.csv"
-       # 
-        ## Fetch and display the CSV data
-        #df = pd.read_csv(csv_url)
-        #st.table(df)
-  
-
 elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
-    #create_carousel(boys_images)
-    
-    #if st.button('Check Available Slots'):
-        # URL of the CSV file on GitHub for the Boys section
-     #   csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/f29a7634156756b337291c96e1ebd1eb94f66b23/slots_17_rows.csv"
-        
-        # Fetch and display the CSV data
-      #  df = pd.read_csv(csv_url)
-       # st.table(df)
     if st.button('Check Available Slots'):
         try:
             df = pd.read_csv(os.path.join('boys_slots.csv'))
@@ -185,7 +165,7 @@ elif st.session_state['page'] == 'Boys':
 
 elif st.session_state['page'] == 'About':
     st.header("About")
-    st.image("https://via.placeholder.com/800x400?text=Fee+Structure", use_column_width=True)
+    st.image("images/fee_structure.jpg", use_column_width=True)
     st.write("Contact us at:")
     st.write("**Phone:** +1234567890")
     st.write("**Email:** info@example.com")
