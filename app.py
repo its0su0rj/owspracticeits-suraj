@@ -1,6 +1,5 @@
 import streamlit as st
-from streamlit.components.v1 import html
-import pandas as pd  # Import pandas for DataFrame creation
+import pandas as pd
 
 # List of images for each section
 library_images = [
@@ -21,7 +20,7 @@ boys_images = [
     "https://via.placeholder.com/800x400?text=Boys+Image+3"
 ]
 
-# Custom CSS and JavaScript for carousel
+# Custom CSS and JavaScript for carousel and navbar
 carousel_script = """
     <script>
         let currentSlide = 0;
@@ -76,6 +75,34 @@ carousel_script = """
         .carousel-button#next {
             right: 0;
         }
+        
+        /* Custom CSS for the navigation bar */
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar a {
+            color: #6c757d;
+            text-decoration: none;
+            text-align: center;
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 18px;
+            border-bottom: 2px solid transparent;
+        }
+        .navbar a.active {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+        }
+        .navbar a:hover {
+            color: #0056b3;
+        }
     </style>
 """
 
@@ -87,29 +114,29 @@ def create_carousel(images):
     '''
     st.components.v1.html(f'<div class="carousel-container">{carousel_images}{carousel_buttons}</div>{carousel_script}', height=450)
 
-# Initialize session state to store which button was last clicked
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'Library'
+# Add the custom CSS for the navbar
+st.markdown(f"""
+    {carousel_script}
+    <div class="navbar">
+        <a href="?page=Library" id="library">📚 Library</a>
+        <a href="?page=Girls" id="girls">👧 Girls</a>
+        <a href="?page=Boys" id="boys">👦 Boys</a>
+        <a href="?page=About" id="about">ℹ️ About</a>
+    </div>
+""", unsafe_allow_html=True)
 
-# Create the button container
-st.sidebar.header("Navigation")
-if st.sidebar.button('📚 Library'):
-    st.session_state['page'] = 'Library'
-if st.sidebar.button('👧 Girls'):
-    st.session_state['page'] = 'Girls'
-if st.sidebar.button('👦 Boys'):
-    st.session_state['page'] = 'Boys'
-if st.sidebar.button('ℹ️ About'):
-    st.session_state['page'] = 'About'
+# Determine the current page
+query_params = st.experimental_get_query_params()
+current_page = query_params.get("page", ["Library"])[0]
 
 # Display content based on the page selected
-if st.session_state['page'] == 'Library':
+if current_page == 'Library':
     st.header("Welcome to the Library")
     st.write("This is a brief introduction about the library.")
     create_carousel(library_images)
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
-elif st.session_state['page'] == 'Girls':
+elif current_page == 'Girls':
     st.header("Girls Section")
     create_carousel(girls_images)
     if st.button('Check Available Slots'):
@@ -122,7 +149,7 @@ elif st.session_state['page'] == 'Girls':
         df = pd.DataFrame(data)
         st.table(df)
 
-elif st.session_state['page'] == 'Boys':
+elif current_page == 'Boys':
     st.header("Boys Section")
     create_carousel(boys_images)
     if st.button('Check Available Slots'):
@@ -135,7 +162,7 @@ elif st.session_state['page'] == 'Boys':
         df = pd.DataFrame(data)
         st.table(df)
 
-elif st.session_state['page'] == 'About':
+elif current_page == 'About':
     st.header("About")
     st.image("https://via.placeholder.com/800x400?text=Fee+Structure", use_column_width=True)
     st.write("Contact us at:")
