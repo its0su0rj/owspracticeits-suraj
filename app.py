@@ -144,27 +144,25 @@ if st.session_state['page'] == 'Library':
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
     create_carousel(girls_images)
+    
     if st.button('Check Available Slots'):
-        data = {
-            'Seat No': [f'Seat {i}' for i in range(1, 13)],
-            'Slot 1': ['Available']*12,
-            'Slot 2': ['Occupied']*12,
-            'Slot 3': ['Available']*12
-        }
-        df = pd.DataFrame(data)
+        # URL of the CSV file on GitHub for the Girls section
+        csv_url = "https://raw.githubusercontent.com/yourusername/your-repo/main/girls_slots.csv"
+        
+        # Fetch and display the CSV data
+        df = pd.read_csv(csv_url)
         st.table(df)
 
 elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
     create_carousel(boys_images)
+    
     if st.button('Check Available Slots'):
-        data = {
-            'Seat No': [f'Seat {i}' for i in range(1, 13)],
-            'Slot 1': ['Available']*12,
-            'Slot 2': ['Occupied']*12,
-            'Slot 3': ['Available']*12
-        }
-        df = pd.DataFrame(data)
+        # URL of the CSV file on GitHub for the Boys section
+        csv_url = "https://raw.githubusercontent.com/yourusername/your-repo/main/boys_slots.csv"
+        
+        # Fetch and display the CSV data
+        df = pd.read_csv(csv_url)
         st.table(df)
 
 elif st.session_state['page'] == 'About':
