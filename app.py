@@ -157,13 +157,19 @@ elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
     create_carousel(boys_images)
     
-    if st.button('Check Available Slots'):
+    #if st.button('Check Available Slots'):
         # URL of the CSV file on GitHub for the Boys section
-        csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/f29a7634156756b337291c96e1ebd1eb94f66b23/slots_17_rows.csv"
+     #   csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/f29a7634156756b337291c96e1ebd1eb94f66b23/slots_17_rows.csv"
         
         # Fetch and display the CSV data
-        df = pd.read_csv(csv_url)
-        st.table(df)
+      #  df = pd.read_csv(csv_url)
+       # st.table(df)
+    if st.button('Check Available Slots'):
+        try:
+            df = pd.read_csv(os.path.join('path_to_your_repository', 'boys_slots.csv'))
+            st.table(df)
+        except Exception as e:
+            st.error(f"Error loading the CSV file: {e}")
 
 elif st.session_state['page'] == 'About':
     st.header("About")
