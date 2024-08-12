@@ -49,7 +49,7 @@ carousel_script = """
     </script>
     <style>
         .carousel-container {
-            max-width: 800px;
+            max-width: 100%;
             margin: auto;
             position: relative;
         }
@@ -91,7 +91,6 @@ carousel_script = """
             color: #6c757d;
             text-decoration: none;
             text-align: center;
-            flex-grow: 1;
             padding: 10px;
             font-size: 18px;
             border-bottom: 2px solid transparent;
@@ -103,6 +102,9 @@ carousel_script = """
         .navbar a:hover {
             color: #0056b3;
         }
+        .navbar a + a {
+            margin-left: 20px;
+        }
     </style>
 """
 
@@ -112,7 +114,7 @@ def create_carousel(images):
         <button id="prev" class="carousel-button">&#10094;</button>
         <button id="next" class="carousel-button">&#10095;</button>
     '''
-    st.components.v1.html(f'<div class="carousel-container">{carousel_images}{carousel_buttons}</div>{carousel_script}', height=450)
+    st.components.v1.html(f'<div class="carousel-container">{carousel_images}{carousel_buttons}</div>{carousel_script}', height=500)
 
 # Add the custom CSS for the navbar
 st.markdown(f"""
@@ -139,6 +141,7 @@ if current_page == 'Library':
 elif current_page == 'Girls':
     st.header("Girls Section")
     create_carousel(girls_images)
+    st.markdown("<div style='margin-top: 20px;'>", unsafe_allow_html=True)
     if st.button('Check Available Slots'):
         data = {
             'Seat No': [f'Seat {i}' for i in range(1, 13)],
@@ -148,10 +151,12 @@ elif current_page == 'Girls':
         }
         df = pd.DataFrame(data)
         st.table(df)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 elif current_page == 'Boys':
     st.header("Boys Section")
     create_carousel(boys_images)
+    st.markdown("<div style='margin-top: 20px;'>", unsafe_allow_html=True)
     if st.button('Check Available Slots'):
         data = {
             'Seat No': [f'Seat {i}' for i in range(1, 13)],
@@ -161,6 +166,7 @@ elif current_page == 'Boys':
         }
         df = pd.DataFrame(data)
         st.table(df)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 elif current_page == 'About':
     st.header("About")
