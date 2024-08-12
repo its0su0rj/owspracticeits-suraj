@@ -144,19 +144,28 @@ if st.session_state['page'] == 'Library':
 
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
-    create_carousel(girls_images)
-    
+    #create_carousel(girls_images)
     if st.button('Check Available Slots'):
-        # URL of the CSV file on GitHub for the Girls section
-        csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/c0d780332ca385c8879d8ac813727b0b990b9e56/slots.csv"
-        
-        # Fetch and display the CSV data
-        df = pd.read_csv(csv_url)
-        st.table(df)
+        try:
+            df = pd.read_csv(os.path.join('girls_slots.csv'))
+            st.table(df)
+        except Exception as e:
+            st.error(f"Error loading the CSV file: {e}")
+    create_carousel(girls_images)
+
+    
+    #if st.button('Check Available Slots'):
+     #   # URL of the CSV file on GitHub for the Girls section
+      #  csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/c0d780332ca385c8879d8ac813727b0b990b9e56/slots.csv"
+       # 
+        ## Fetch and display the CSV data
+        #df = pd.read_csv(csv_url)
+        #st.table(df)
+  
 
 elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
-    create_carousel(boys_images)
+    #create_carousel(boys_images)
     
     #if st.button('Check Available Slots'):
         # URL of the CSV file on GitHub for the Boys section
@@ -171,6 +180,7 @@ elif st.session_state['page'] == 'Boys':
             st.table(df)
         except Exception as e:
             st.error(f"Error loading the CSV file: {e}")
+    create_carousel(boys_images)
 
 elif st.session_state['page'] == 'About':
     st.header("About")
