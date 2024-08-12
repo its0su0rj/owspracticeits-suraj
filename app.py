@@ -139,6 +139,7 @@ st.write("\n\n")
 if st.session_state['page'] == 'Library':
     st.header("Welcome to the Library")
     st.write("This is a brief introduction about the library.")
+    st.markdown('[Chat with us on WhatsApp](https://wa.me/8809680722)')
     create_carousel(library_images)
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
