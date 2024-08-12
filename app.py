@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 
 # List of images for each section
 library_images = [
