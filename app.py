@@ -6,7 +6,7 @@ import os
 library_images = [
     "https://via.placeholder.com/800x400?text=Library+Image+1",
     "https://via.placeholder.com/800x400?text=Library+Image+2",
-    "https://via.placeholder.com/800x400?text=Library+Image+3"
+    "https://github.com/its0su0rj/owspracticeits-suraj/blob/341119cab8d105b49b1d073dc2e97f1fe846c030/IMG-20240812-WA0001.jpg"
 ]
 
 girls_images = [
