@@ -10,7 +10,7 @@ library_images = [
 ]
 
 girls_images = [
-    "images/girls_image_1.jpg",
+    "IMG-20240812-WA0002.jpg",
     "images/girls_image_2.jpg",
     "images/girls_image_3.jpg"
 ]
