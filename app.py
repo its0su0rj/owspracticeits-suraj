@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit.components.v1 import html
+import pandas as pd  # Import pandas for DataFrame creation
 
 # List of images for each section
 library_images = [
