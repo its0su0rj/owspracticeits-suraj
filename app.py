@@ -147,7 +147,7 @@ elif st.session_state['page'] == 'Girls':
     
     if st.button('Check Available Slots'):
         # URL of the CSV file on GitHub for the Girls section
-        csv_url = ""
+        csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/c0d780332ca385c8879d8ac813727b0b990b9e56/slots.csv"
         
         # Fetch and display the CSV data
         df = pd.read_csv(csv_url)
