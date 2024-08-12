@@ -166,7 +166,7 @@ elif st.session_state['page'] == 'Boys':
        # st.table(df)
     if st.button('Check Available Slots'):
         try:
-            df = pd.read_csv(os.path.join('path_to_your_repository', 'boys_slots.csv'))
+            df = pd.read_csv(os.path.join('boys_slots.csv'))
             st.table(df)
         except Exception as e:
             st.error(f"Error loading the CSV file: {e}")
