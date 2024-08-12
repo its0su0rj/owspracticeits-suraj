@@ -147,7 +147,7 @@ elif st.session_state['page'] == 'Girls':
     
     if st.button('Check Available Slots'):
         # URL of the CSV file on GitHub for the Girls section
-        csv_url = "https://raw.githubusercontent.com/yourusername/your-repo/main/girls_slots.csv"
+        csv_url = ""
         
         # Fetch and display the CSV data
         df = pd.read_csv(csv_url)
@@ -159,7 +159,7 @@ elif st.session_state['page'] == 'Boys':
     
     if st.button('Check Available Slots'):
         # URL of the CSV file on GitHub for the Boys section
-        csv_url = "https://raw.githubusercontent.com/yourusername/your-repo/main/boys_slots.csv"
+        csv_url = "https://github.com/its0su0rj/owspracticeits-suraj/blob/f29a7634156756b337291c96e1ebd1eb94f66b23/slots_17_rows.csv"
         
         # Fetch and display the CSV data
         df = pd.read_csv(csv_url)
