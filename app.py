@@ -4,21 +4,21 @@ import os
 
 # List of images for each section
 library_images = [
-    "https://via.placeholder.com/800x400?text=Library+Image+1",
-    "https://via.placeholder.com/800x400?text=Library+Image+2",
-    "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/IMG-20240812-WA0001.jpg"  # Updated GitHub URL
+    
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library1.jpg",
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library2.jpg",
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library31.jpg",
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library4.jpg",
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/librarylast.jpg"# Updated GitHub URL
 ]
 
 girls_images = [
-    "https://via.placeholder.com/800x400?text=Girls+Image+1",
-    "https://via.placeholder.com/800x400?text=Girls+Image+2",
-    "https://via.placeholder.com/800x400?text=Girls+Image+3"
+    
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/girls1.jpg"
 ]
 
 boys_images = [
-    "https://via.placeholder.com/800x400?text=Boys+Image+1",
-    "https://via.placeholder.com/800x400?text=Boys+Image+2",
-    "https://via.placeholder.com/800x400?text=Boys+Image+3"
+    "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/boys1.jpg"
 ]
 
 # Custom CSS for the navigation bar
@@ -74,36 +74,38 @@ st.write("\n\n")
 def display_images(images):
     for img in images:
         st.image(img, use_column_width=True)
-# Function to display the seat availability with custom icons
-def display_seat_availability(df):
-    # Replace 'res' with a blue tick and 'avl' with a vacant space
-    df = df.replace({
-        'res': "<span style='color: blue;'>&#10003;</span>",  # Blue tick
-        'avl': "&nbsp;"  # Vacant space
-    })
-    
-    # Convert the DataFrame to HTML and display it
-    st.markdown(df.to_html(escape=False, index=False), unsafe_allow_html=True)
-
-
-
 
 # Display content based on the page selected
 if st.session_state['page'] == 'Library':
-    st.header("Welcome to the Library")
-    st.write("This is a brief introduction about the library.")
+    st.header("Welcome to the Krishna Library")
+    st.write(
+    "The library features a beautiful, calming environment with air conditioning, comfortable chairs, and proper tables. It is designed to support long-hour study sessions effectively."
+)
+    st.markdown(
+    "<span style='color:red; font-weight:bold;'>A 24/7 CCTV monitoring system ensures safety at all times.</span>",
+    unsafe_allow_html=True
+)
+
+
     st.markdown('[Chat with us on WhatsApp](https://wa.me/8809680722)')
     display_images(library_images)
-    st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    st.video("https://youtu.be/GlUyCSSF6RI?si=1MZFVshIQxZ8jKl-")
 
-# Display content based on the page selected
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
+    st.write(
+    "A 24/7 CCTV monitoring system ensures safety at all times.\n\n")
+    st.markdown(
+    "<span style='color:green; font-weight:bold;'>To all the girls studying here: Embrace your strength, pursue your passions with determination, and let this library be a sanctuary where your dreams take flight. Your dedication and hard work will pave the way for a brighter future.</span>",
+    unsafe_allow_html=True
+)
     st.write("avl=seat available, res=seat taken")
+
+
     if st.button('Check Available Slots'):
         try:
             df = pd.read_csv(os.path.join('girls_slots.csv'))
-            display_seat_availability(df)
+            st.table(df)
         except Exception as e:
             st.error(f"Error loading the CSV file: {e}")
     display_images(girls_images)
@@ -114,17 +116,15 @@ elif st.session_state['page'] == 'Boys':
     if st.button('Check Available Slots'):
         try:
             df = pd.read_csv(os.path.join('boys_slots.csv'))
-            display_seat_availability(df)
+            st.table(df)
         except Exception as e:
             st.error(f"Error loading the CSV file: {e}")
     display_images(boys_images)
 
-
-
-
 elif st.session_state['page'] == 'About':
     st.header("About")
-    st.image("https://via.placeholder.com/800x400?text=Fee+Structure", use_column_width=True)
+    st.image("https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/fee.jpg", use_column_width=True)
     st.write("Contact us at:")
-    st.write("**Phone:** +1234567890")
-    st.write("**Email:** info@example.com")
+    st.write("Ankit Gupta")
+    st.write("**Phone:** 8809680722")
+    st.write("**Email:** akedufiles@gmail.com")
