@@ -74,6 +74,19 @@ st.write("\n\n")
 def display_images(images):
     for img in images:
         st.image(img, use_column_width=True)
+# Function to display the seat availability with custom icons
+def display_seat_availability(df):
+    # Replace 'res' with a blue tick and 'avl' with a vacant space
+    df = df.replace({
+        'res': "<span style='color: blue;'>&#10003;</span>",  # Blue tick
+        'avl': "&nbsp;"  # Vacant space
+    })
+    
+    # Convert the DataFrame to HTML and display it
+    st.markdown(df.to_html(escape=False, index=False), unsafe_allow_html=True)
+
+
+
 
 # Display content based on the page selected
 if st.session_state['page'] == 'Library':
@@ -83,25 +96,31 @@ if st.session_state['page'] == 'Library':
     display_images(library_images)
     st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
+# Display content based on the page selected
 elif st.session_state['page'] == 'Girls':
     st.header("Girls Section")
+    st.write("avl=seat available, res=seat taken")
     if st.button('Check Available Slots'):
         try:
             df = pd.read_csv(os.path.join('girls_slots.csv'))
-            st.table(df)
+            display_seat_availability(df)
         except Exception as e:
             st.error(f"Error loading the CSV file: {e}")
     display_images(girls_images)
 
 elif st.session_state['page'] == 'Boys':
     st.header("Boys Section")
+    st.write("avl=seat available, res=seat taken")
     if st.button('Check Available Slots'):
         try:
             df = pd.read_csv(os.path.join('boys_slots.csv'))
-            st.table(df)
+            display_seat_availability(df)
         except Exception as e:
             st.error(f"Error loading the CSV file: {e}")
     display_images(boys_images)
+
+
+
 
 elif st.session_state['page'] == 'About':
     st.header("About")
