@@ -1,11 +1,13 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import pandas as pd
 import os
+import streamlit.components.v1 as components
 
-# Embed the flower shower effect using particles.js
-particles_js = """
-<!DOCTYPE html>
+
+
+# Your existing Streamlit code here...
+
+particles_js = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -14,18 +16,18 @@ particles_js = """
   <style>
   #particles-js {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     top: 0;
     left: 0;
     z-index: -1; /* Send the animation to the back */
-    background: transparent; /* Ensure it does not obstruct content */
   }
   .content {
     position: relative;
     z-index: 1;
+    color: white;
   }
-</style>
+  </style>
 </head>
 <body>
   <div id="particles-js"></div>
@@ -44,7 +46,7 @@ particles_js = """
           }
         },
         "color": {
-          "value": "#ff6f61"  // Change color to resemble flowers
+          "value": "#ffffff"
         },
         "shape": {
           "type": "circle",
@@ -54,27 +56,48 @@ particles_js = """
           },
           "polygon": {
             "nb_sides": 5
-          },
+          }
         },
         "opacity": {
           "value": 0.5,
-          "random": true,
+          "random": false,
+          "anim": {
+            "enable": false,
+            "speed": 1,
+            "opacity_min": 0.2,
+            "sync": false
+          }
         },
         "size": {
-          "value": 4,
+          "value": 2,
           "random": true,
+          "anim": {
+            "enable": false,
+            "speed": 40,
+            "size_min": 0.1,
+            "sync": false
+          }
         },
         "line_linked": {
-          "enable": false
+          "enable": true,
+          "distance": 100,
+          "color": "#ffffff",
+          "opacity": 0.22,
+          "width": 1
         },
         "move": {
           "enable": true,
-          "speed": 2,
-          "direction": "bottom",
-          "random": true,
+          "speed": 0.2,
+          "direction": "none",
+          "random": false,
           "straight": false,
           "out_mode": "out",
-          "bounce": false,
+          "bounce": true,
+          "attract": {
+            "enable": false,
+            "rotateX": 600,
+            "rotateY": 1200
+          }
         }
       },
       "interactivity": {
@@ -82,36 +105,37 @@ particles_js = """
         "events": {
           "onhover": {
             "enable": true,
-            "mode": "repulse"
+            "mode": "grab"
           },
           "onclick": {
             "enable": true,
-            "mode": "push"
+            "mode": "repulse"
           },
           "resize": true
         },
         "modes": {
           "grab": {
-            "distance": 400,
+            "distance": 100,
             "line_linked": {
               "opacity": 1
             }
           },
           "bubble": {
             "distance": 400,
-            "size": 40,
+            "size": 2,
             "duration": 2,
-            "opacity": 8,
-            "speed": 3
+            "opacity": 0.5,
+            "speed": 1
           },
           "repulse": {
-            "distance": 200
+            "distance": 200,
+            "duration": 0.4
           },
           "push": {
-            "particles_nb": 4
+            "particles_nb": 2
           },
           "remove": {
-            "particles_nb": 2
+            "particles_nb": 3
           }
         }
       },
@@ -122,10 +146,11 @@ particles_js = """
 </html>
 """
 
-# Call the particles.js effect in Streamlit
-components.html(particles_js, height=0, width=0)
 
-# Your existing Streamlit code continues here...
+components.html(particles_js, height=500)
+
+# The rest of your library management code...
+# Your navigation bar, page sections, and content
 # List of images for each section
 library_images = [
     "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library1.jpg",
@@ -260,3 +285,4 @@ elif st.session_state['page'] == 'About':
     st.write("Ankit Gupta")
     st.write("**Phone:** 8809680722")
     st.write("**Email:** akedufiles@gmail.com")
+
