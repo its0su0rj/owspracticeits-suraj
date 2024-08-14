@@ -3,7 +3,6 @@ import streamlit.components.v1 as components
 import pandas as pd
 import os
 
-
 # Embed the flower shower effect using particles.js
 particles_js = """
 <!DOCTYPE html>
@@ -15,11 +14,12 @@ particles_js = """
   <style>
   #particles-js {
     position: fixed;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     top: 0;
     left: 0;
     z-index: -1; /* Send the animation to the back */
+    background: transparent; /* Ensure it does not obstruct content */
   }
   .content {
     position: relative;
@@ -123,11 +123,9 @@ particles_js = """
 """
 
 # Call the particles.js effect in Streamlit
-components.html(particles_js, height=600, width=800)
+components.html(particles_js, height=0, width=0)
 
-import streamlit as st
-
-
+# Your existing Streamlit code continues here...
 # List of images for each section
 library_images = [
     "https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library1.jpg",
@@ -262,4 +260,3 @@ elif st.session_state['page'] == 'About':
     st.write("Ankit Gupta")
     st.write("**Phone:** 8809680722")
     st.write("**Email:** akedufiles@gmail.com")
-
