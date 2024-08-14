@@ -137,7 +137,7 @@ elif st.session_state['page'] == 'About':
     st.write("**Phone:** 8809680722")
     st.write("**Email:** akedufiles@gmail.com")
 
-import streamlit as st
+
 
 # Your existing Streamlit code goes here...
 
@@ -163,7 +163,7 @@ st.markdown("""
             flower.style.left = Math.random() * 100 + 'vw';
             flower.style.width = Math.random() * 10 + 20 + 'px';
             flower.style.height = flower.style.width;
-            flower.style.backgroundImage = 'url(https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/library1.jpg)';
+            flower.style.backgroundImage = 'url(https://raw.githubusercontent.com/guptaankit01/krishnalibrary/main/girls1.jpg)';
             flower.style.backgroundSize = 'cover';
             document.body.appendChild(flower);
 
@@ -174,5 +174,7 @@ st.markdown("""
 
         setInterval(addFlower, 300);
     </script>
+""", unsafe_allow_html=True)
+
 """, unsafe_allow_html=True)
 
