@@ -1,11 +1,10 @@
 import streamlit as st
-import time
 import difflib
 from datetime import datetime, timedelta
 
 # Function to calculate WPM
-def calculate_wpm(start_time, current_time, text_length):
-    elapsed_time = (current_time - start_time) / 60  # Time in minutes
+def calculate_wpm(start_time, end_time, text_length):
+    elapsed_time = (end_time - start_time).total_seconds() / 60  # Time in minutes
     wpm = text_length / 5 / elapsed_time if elapsed_time > 0 else 0
     return wpm
 
@@ -15,18 +14,6 @@ def calculate_errors(original_text, typed_text):
     differences = list(differ.compare(original_text.split(), typed_text.split()))
     errors = [diff for diff in differences if diff.startswith('- ')]
     return len(errors), differences
-
-# Function to display suggestions
-def suggest_improvements(errors, total_words):
-    error_rate = (errors / total_words) * 100
-    suggestions = []
-    if error_rate > 10:
-        suggestions.append("Consider slowing down and focusing on accuracy.")
-    if error_rate > 5 and error_rate <= 10:
-        suggestions.append("You're doing well, but try to reduce the number of errors.")
-    if error_rate <= 5:
-        suggestions.append("Great job! Keep practicing to maintain your accuracy.")
-    return suggestions
 
 # Function to highlight errors in the typed text
 def highlight_errors(differences):
@@ -40,58 +27,44 @@ def highlight_errors(differences):
             highlighted_text.append(diff[2:])
     return ' '.join(highlighted_text)
 
+# Streamlit app title
 st.title("Typing Practice App")
 
+# Upload text file to practice
 uploaded_file = st.file_uploader("Upload a text file to practice", type=["txt"])
 
 if uploaded_file is not None:
+    # Display the original text to be typed
     text = uploaded_file.read().decode("utf-8")
     st.write("Here is the text you will be practicing:")
     st.write(text)
 
-    start_time = None
-    end_time = None
+    # Capture the start time
+    start_time = datetime.now()
 
-    if st.button("Start Typing"):
-        start_time = datetime.now()
-        time_limit = timedelta(minutes=20)
+    # User input field for typing practice
+    user_input = st.text_area("Start typing the text here:", height=300, key="typing_area")
 
-        # Create a placeholder for WPM updates
-        wpm_placeholder = st.empty()
-
-        # User input field
-        user_input = st.text_area("Start typing the text here:", height=300, key="typing_area")
-
-        # Loop to calculate and display WPM
-        while (datetime.now() - start_time) < time_limit:
-            current_time = datetime.now()
-            text_length = len(user_input)
-            wpm = calculate_wpm(start_time.timestamp(), current_time.timestamp(), text_length)
-
-            # Update the WPM in the placeholder
-            wpm_placeholder.write(f"**Real-Time Words Per Minute (WPM):** {wpm:.2f}")
-
-            # Sleep for a short period before the next update
-            time.sleep(1)
-
-        # Analysis after 20 minutes or when the user stops typing
+    # Button to submit and evaluate the typing performance
+    if st.button("Submit"):
+        # Capture the end time when the user submits the text
         end_time = datetime.now()
+
+        # Calculate WPM based on the elapsed time and the length of the typed text
+        text_length = len(user_input)
+        wpm = calculate_wpm(start_time, end_time, text_length)
+
+        # Calculate errors by comparing the original text and typed text
         total_words = len(text.split())
         errors, differences = calculate_errors(text, user_input)
         error_percentage = (errors / total_words) * 100
-        suggestions = suggest_improvements(errors, total_words)
         highlighted_text = highlight_errors(differences)
 
+        # Display the results: WPM, total errors, error percentage, and highlighted text
         st.write("### Typing Analysis")
         st.write(f"**Words Per Minute (WPM):** {wpm:.2f}")
         st.write(f"**Total Errors:** {errors}")
         st.write(f"**Error Percentage:** {error_percentage:.2f}%")
 
-        st.write("### Suggestions for Improvement")
-        for suggestion in suggestions:
-            st.write(f"- {suggestion}")
-
         st.write("### Error Highlighting")
         st.markdown(highlighted_text, unsafe_allow_html=True)
-    else:
-        st.warning("Please start typing to begin the practice session.")
