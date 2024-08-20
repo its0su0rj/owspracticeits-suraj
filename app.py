@@ -55,16 +55,21 @@ if uploaded_file is not None:
     if st.button("Start Typing"):
         start_time = datetime.now()
         time_limit = timedelta(minutes=20)
-        
-        # Move the text area outside the loop
+
         user_input = st.text_area("Start typing the text here:", height=300, key="typing_area")
+        
+        # Create a placeholder for WPM updates
+        wpm_placeholder = st.empty()
         
         # Loop to calculate and display WPM
         while (datetime.now() - start_time) < time_limit:
             current_time = datetime.now()
             text_length = len(user_input)
             wpm = calculate_wpm(start_time.timestamp(), current_time.timestamp(), text_length)
-            st.write(f"**Real-Time Words Per Minute (WPM):** {wpm:.2f}")
+            
+            # Update the WPM in the placeholder
+            wpm_placeholder.write(f"**Real-Time Words Per Minute (WPM):** {wpm:.2f}")
+            
             time.sleep(1)
 
         # Analysis after 20 minutes or when the user stops typing
