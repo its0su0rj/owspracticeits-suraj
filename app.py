@@ -59,7 +59,8 @@ if uploaded_file is not None:
         
         while (datetime.now() - start_time) < time_limit:
             current_time = datetime.now()
-            user_input = st.text_area("Start typing the text here:", height=300, key="typing_area")
+            # Use a unique key based on timestamp
+            user_input = st.text_area("Start typing the text here:", height=300, key=f"typing_area_{current_time.timestamp()}")
             
             text_length = len(user_input)
             wpm = calculate_wpm(start_time.timestamp(), current_time.timestamp(), text_length)
