@@ -53,16 +53,16 @@ if uploaded_file is not None:
             st.session_state.start_time = None
             st.write("**Time's up!** Automatically submitting your typing.")
 
-        # Display the original text and typing area side by side
+        # Display the original text and typing area in two equal halves
         col1, col2 = st.columns(2)
 
         with col1:
             st.subheader("Original Text")
-            st.write(text)
+            st.write(f"<div style='height:400px; overflow:auto;'>{text}</div>", unsafe_allow_html=True)
 
         with col2:
             st.subheader("Type Here")
-            user_input = st.text_area("Start typing the text here:", height=300, key="typing_area")
+            user_input = st.text_area("Start typing the text here:", height=400, key="typing_area")
 
         # Automatically submit if the timer runs out
         if time_remaining.total_seconds() <= 0 or st.button("Submit"):
