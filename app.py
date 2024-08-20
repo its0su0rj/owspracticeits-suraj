@@ -51,24 +51,28 @@ if uploaded_file is not None:
 
     start_time = None
     end_time = None
+    user_input = st.empty()
 
     if st.button("Start Typing"):
         start_time = datetime.now()
         time_limit = timedelta(minutes=20)
 
         user_input = st.text_area("Start typing the text here:", height=300, key="typing_area")
-        
+
         # Create a placeholder for WPM updates
         wpm_placeholder = st.empty()
-        
+
         # Loop to calculate and display WPM
         while (datetime.now() - start_time) < time_limit:
             current_time = datetime.now()
             text_length = len(user_input)
             wpm = calculate_wpm(start_time.timestamp(), current_time.timestamp(), text_length)
-            
+
             # Update the WPM in the placeholder
             wpm_placeholder.write(f"**Real-Time Words Per Minute (WPM):** {wpm:.2f}")
+
+            # Capture the typed text dynamically
+            user_input = st.text_area("Start typing the text here:", height=300, key="typing_area", value=user_input)
             
             time.sleep(1)
 
@@ -79,16 +83,16 @@ if uploaded_file is not None:
         error_percentage = (errors / total_words) * 100
         suggestions = suggest_improvements(errors, total_words)
         highlighted_text = highlight_errors(differences)
-        
+
         st.write("### Typing Analysis")
         st.write(f"**Words Per Minute (WPM):** {wpm:.2f}")
         st.write(f"**Total Errors:** {errors}")
         st.write(f"**Error Percentage:** {error_percentage:.2f}%")
-        
+
         st.write("### Suggestions for Improvement")
         for suggestion in suggestions:
             st.write(f"- {suggestion}")
-        
+
         st.write("### Error Highlighting")
         st.markdown(highlighted_text, unsafe_allow_html=True)
     else:
