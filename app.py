@@ -67,25 +67,14 @@ def main():
 
         # Submit button
         if st.button("Submit"):
-            # Debugging information
-            st.write("Available columns:", df.columns)
-            st.write("Example row:", row)
-            st.write("Correct answer column:", row['correct_ans'])
-
             # Check answers and calculate score
             incorrect_answers = []
             for i, row in df.iterrows():
-                correct_ans_col = row['correct_ans']
-                # Check if the correct answer column exists
-                if correct_ans_col in df.columns:
-                    correct_option = row[correct_ans_col]
-                    if user_answers[i] == correct_option:
-                        score += 1
-                    else:
-                        incorrect_answers.append((row['question'], correct_option))
+                correct_option = row['correct_ans']  # Directly get the correct answer text
+                if user_answers[i] == correct_option:
+                    score += 1
                 else:
-                    st.write(f"Warning: Correct answer column '{correct_ans_col}' not found.")
-                    incorrect_answers.append((row['question'], 'Unknown'))
+                    incorrect_answers.append((row['question'], correct_option))
 
             # Display score
             st.write(f"Your total score: {score}/{total_questions}")
