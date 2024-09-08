@@ -1,19 +1,29 @@
 import streamlit as st
 import pandas as pd
-import os
+import requests
+from io import StringIO
 
-# Load questions from CSV file
-def load_questions(file_path):
-    df = pd.read_csv(file_path)
-    return df
+# Load questions from a CSV URL
+def load_questions(file_url):
+    try:
+        # Fetch the CSV file content from the URL
+        response = requests.get(file_url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        # Convert the response content into a pandas-readable format
+        csv_data = StringIO(response.text)
+        df = pd.read_csv(csv_data)
+        return df
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
 
 # Fetch list of quiz sets
 def get_quiz_sets():
-    # You can replace this list with a dynamic fetch from your GitHub repo if needed
+    # Replace this list with actual URLs to your CSV files in the GitHub repo
     quiz_sets = {
-        #"Set 1": "https://raw.githubusercontent.com/your-username/your-repo/main/set1.csv",
-        #"Set 2": "https://raw.githubusercontent.com/your-username/your-repo/main/set2.csv",
-        "Set 3": "https://github.com/its0su0rj/owspracticeits-suraj/main/current_affairs_questions.csv",
+        "Set 1": "https://raw.githubusercontent.com/your-username/your-repo/main/set1.csv",
+        "Set 2": "https://raw.githubusercontent.com/your-username/your-repo/main/set2.csv",
+        "Set 3": "https://raw.githubusercontent.com/your-username/your-repo/main/set3.csv",
     }
     return quiz_sets
 
@@ -31,6 +41,8 @@ def main():
     if selected_set:
         st.write(f"**You selected: {selected_set}**")
         df = load_questions(quiz_sets[selected_set])
+        if df.empty:
+            return
         total_questions = len(df)
         score = 0
         user_answers = []
