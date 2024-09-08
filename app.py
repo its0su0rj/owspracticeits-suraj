@@ -11,10 +11,16 @@ def load_questions(file_url):
         response.raise_for_status()  # Raise an error for bad status codes
         # Convert the response content into a pandas-readable format
         csv_data = StringIO(response.text)
-        df = pd.read_csv(csv_data)
+        df = pd.read_csv(csv_data, quotechar='"', skipinitialspace=True)
         return df
     except requests.exceptions.RequestException as e:
         st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
+    except pd.errors.EmptyDataError:
+        st.error("The data is empty or improperly formatted.")
+        return pd.DataFrame()
+    except pd.errors.ParserError:
+        st.error("Error parsing the data. Ensure the CSV format is correct.")
         return pd.DataFrame()
 
 # Fetch list of quiz sets
@@ -43,7 +49,9 @@ def main():
         st.write(f"**You selected: {selected_set}**")
         df = load_questions(quiz_sets[selected_set])
         if df.empty:
+            st.write("No data available for the selected quiz set.")
             return
+        
         total_questions = len(df)
         score = 0
         user_answers = []
@@ -62,7 +70,7 @@ def main():
             # Check answers and calculate score
             incorrect_answers = []
             for i, row in df.iterrows():
-                correct_option = row[f"{row['correct_ans']}"]
+                correct_option = row[row['correct_ans']]
                 if user_answers[i] == correct_option:
                     score += 1
                 else:
