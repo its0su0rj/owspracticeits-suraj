@@ -23,7 +23,7 @@ def get_quiz_sets():
     quiz_sets = {
         "Set 1": "https://raw.githubusercontent.com/your-username/your-repo/main/set1.csv",
         "Set 2": "https://raw.githubusercontent.com/your-username/your-repo/main/set2.csv",
-        "Set 3": "https://github.com/its0su0rj/owspracticeits-suraj/blob/8bcf1b36bedc3ef5dc4dc84f3dc6a07f388db68b/current_affairs_questions.csv",
+        "Set 3": "https://raw.github.com/its0su0rj/owspracticeits-suraj/main/current_affairs_questions.csv",
     }
     return quiz_sets
 
