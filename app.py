@@ -28,9 +28,9 @@ def get_quiz_sets():
     # Replace this list with actual URLs to your CSV files in the GitHub repo
     quiz_sets = {
          "Set 1": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set1.csv",
-        "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set2.csv",
-        "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set3.csv",
-        "Set 4": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set4.csv"
+         "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set2.csv",
+         "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set3.csv",
+         "Set 4": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set4.csv"
     }
     return quiz_sets
 
@@ -67,14 +67,25 @@ def main():
 
         # Submit button
         if st.button("Submit"):
+            # Debugging information
+            st.write("Available columns:", df.columns)
+            st.write("Example row:", row)
+            st.write("Correct answer column:", row['correct_ans'])
+
             # Check answers and calculate score
             incorrect_answers = []
             for i, row in df.iterrows():
-                correct_option = row[row['correct_ans']]  # Correct answer column value
-                if user_answers[i] == correct_option:
-                    score += 1
+                correct_ans_col = row['correct_ans']
+                # Check if the correct answer column exists
+                if correct_ans_col in df.columns:
+                    correct_option = row[correct_ans_col]
+                    if user_answers[i] == correct_option:
+                        score += 1
+                    else:
+                        incorrect_answers.append((row['question'], correct_option))
                 else:
-                    incorrect_answers.append((row['question'], correct_option))
+                    st.write(f"Warning: Correct answer column '{correct_ans_col}' not found.")
+                    incorrect_answers.append((row['question'], 'Unknown'))
 
             # Display score
             st.write(f"Your total score: {score}/{total_questions}")
