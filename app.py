@@ -21,9 +21,10 @@ def load_questions(file_url):
 def get_quiz_sets():
     # Replace this list with actual URLs to your CSV files in the GitHub repo
     quiz_sets = {
-        "Set 1": "https://raw.githubusercontent.com/your-username/your-repo/main/set1.csv",
-        "Set 2": "https://raw.githubusercontent.com/your-username/your-repo/main/set2.csv",
-        "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/current_affairs_questions.csv",
+        "Set 1": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set1.csv",
+        "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set2.csv",
+        "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set3.csv",
+        "Set 4": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set4.csv"
     }
     return quiz_sets
 
