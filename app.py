@@ -2,27 +2,24 @@ import streamlit as st
 import pandas as pd
 import requests
 from io import StringIO
-import os
 
-# Load questions from a CSV URL
-def load_questions(file_url, local_filename):
-    # If local corrected file exists, load it instead of URL
-    if os.path.exists(local_filename):
-        return pd.read_csv(local_filename)
+# Load questions
+def load_questions(file_url):
     try:
         response = requests.get(file_url)
         response.raise_for_status()
         csv_data = StringIO(response.text)
         df = pd.read_csv(csv_data, quotechar='"', skipinitialspace=True)
+        if "correct_ans" not in df.columns:
+            df["correct_ans"] = ""
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return pd.DataFrame()
 
-# Fetch list of quiz sets
-
+# Quiz sets
 def get_quiz_sets():
-    quiz_sets = {
+    return {
          "Set 1": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
          "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
          "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
@@ -32,62 +29,60 @@ def get_quiz_sets():
          "Set 7": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
          "Set 8": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025.csv"
     }
-    return quiz_sets
 
-
-# Main function to display the quiz
 def main():
-    st.title("Current Affairs Quiz")
+    st.title("📘 Current Affairs Quiz")
 
     quiz_sets = get_quiz_sets()
-    selected_set = st.selectbox("Select a quiz set to practice:", list(quiz_sets.keys()))
+    selected_set = st.selectbox("Select a quiz set:", list(quiz_sets.keys()))
 
     if selected_set:
-        st.write(f"**You selected: {selected_set}**")
-        local_filename = f"{selected_set.lower().replace(' ', '_')}.csv"
-        df = load_questions(get_quiz_sets()[selected_set], local_filename)
+        df = load_questions(quiz_sets[selected_set])
 
         if df.empty:
-            st.write("No data available for the selected quiz set.")
+            st.warning("⚠️ No data available for this quiz set.")
             return
-        
+
+        if "answer_keys" not in st.session_state:
+            st.session_state.answer_keys = {}
+
         total_questions = len(df)
         score = 0
         user_answers = []
 
-        st.write("**Please answer the following questions:**")
+        st.subheader("Answer the questions:")
 
         for index, row in df.iterrows():
             st.write(f"**Q{index+1}: {row['question']}**")
             options = [row['1'], row['2'], row['3'], row['4']]
-            user_answer = st.radio(f"Select your answer for Q{index+1}:", options, key=index)
+            user_answer = st.radio(f"Your answer for Q{index+1}:", options, key=f"{selected_set}_{index}")
             user_answers.append(user_answer)
 
         if st.button("Submit"):
-            # If no correct answers exist → save first attempt as correct
-            if "correct_ans" not in df.columns or df["correct_ans"].isnull().all() or (df["correct_ans"] == "").all():
-                df["correct_ans"] = user_answers
-                df.to_csv(local_filename, index=False, encoding="utf-8-sig")
-                st.success(f"✅ First attempt saved! Correct answers stored in {local_filename}. Please rerun to test yourself.")
+            # First attempt → save as session answer key
+            if selected_set not in st.session_state.answer_keys:
+                st.session_state.answer_keys[selected_set] = user_answers
+                st.success("✅ First attempt saved as answer key (session only). Rerun to evaluate.")
                 return
 
-            incorrect_answers = []
-            for i, row in df.iterrows():
-                correct_option = row['correct_ans']
-                if user_answers[i] == correct_option:
+            # Next attempts → evaluate
+            correct_answers = st.session_state.answer_keys[selected_set]
+            incorrect = []
+            for i, user_ans in enumerate(user_answers):
+                if user_ans == correct_answers[i]:
                     score += 1
                 else:
-                    incorrect_answers.append((row['question'], correct_option))
+                    incorrect.append((df.iloc[i]['question'], correct_answers[i]))
 
-            st.write(f"Your total score: {score}/{total_questions}")
-
-            if incorrect_answers:
-                st.write("**Questions you got wrong:**")
-                for question, correct in incorrect_answers:
-                    st.write(f"**Question:** {question}")
-                    st.write(f"**Correct Answer:** {correct}")
+            st.write(f"### ✅ Your Score: {score}/{total_questions}")
+            if incorrect:
+                st.error("❌ Incorrect Answers:")
+                for q, correct in incorrect:
+                    st.write(f"**Q:** {q}")
+                    st.write(f"**Correct:** {correct}")
             else:
-                st.write("🎉 Congratulations! All your answers are correct!")
+                st.balloons()
+                st.success("🎉 Perfect! All answers correct.")
 
 if __name__ == "__main__":
     main()
