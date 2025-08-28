@@ -3,31 +3,65 @@ import pandas as pd
 import requests
 from io import StringIO
 
-# Load questions
+# Load questions CSV
 def load_questions(file_url):
     try:
         response = requests.get(file_url)
         response.raise_for_status()
         csv_data = StringIO(response.text)
         df = pd.read_csv(csv_data, quotechar='"', skipinitialspace=True)
-        if "correct_ans" not in df.columns:
-            df["correct_ans"] = ""
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return pd.DataFrame()
 
-# Quiz sets
+# Load answers CSV
+def load_answers(ans_url):
+    try:
+        response = requests.get(ans_url)
+        response.raise_for_status()
+        csv_data = StringIO(response.text)
+        df = pd.read_csv(csv_data)
+        return df
+    except Exception as e:
+        st.error(f"Error loading answers: {e}")
+        return pd.DataFrame()
+
+# Quiz sets (questions + answers)
 def get_quiz_sets():
     return {
-         "Set 1": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
-         "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
-         "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
-         "Set 4": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025.csv",
-         "Set 5": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025.csv",
-         "Set 6": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025.csv",
-         "Set 7": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
-         "Set 8": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025.csv"
+         "Set 1": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
+         },
+         "Set 2": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
+         },
+         "Set 3": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025ans.csv"
+         },
+         "Set 4": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025ans.csv"
+         },
+         "Set 5": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025ans.csv"
+         },
+         "Set 6": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025ans.csv"
+         },
+         "Set 7": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
+         },
+         "Set 8": {
+             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025.csv",
+             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025ans.csv"
+         }
     }
 
 def main():
@@ -37,42 +71,35 @@ def main():
     selected_set = st.selectbox("Select a quiz set:", list(quiz_sets.keys()))
 
     if selected_set:
-        df = load_questions(quiz_sets[selected_set])
+        # Load questions and answers
+        df_q = load_questions(quiz_sets[selected_set]["questions"])
+        df_a = load_answers(quiz_sets[selected_set]["answers"])
 
-        if df.empty:
-            st.warning("⚠️ No data available for this quiz set.")
+        if df_q.empty or df_a.empty:
+            st.warning("⚠️ Data not available for this set.")
             return
 
-        if "answer_keys" not in st.session_state:
-            st.session_state.answer_keys = {}
-
-        total_questions = len(df)
+        total_questions = len(df_q)
         score = 0
         user_answers = []
 
         st.subheader("Answer the questions:")
 
-        for index, row in df.iterrows():
+        for index, row in df_q.iterrows():
             st.write(f"**Q{index+1}: {row['question']}**")
             options = [row['1'], row['2'], row['3'], row['4']]
             user_answer = st.radio(f"Your answer for Q{index+1}:", options, key=f"{selected_set}_{index}")
             user_answers.append(user_answer)
 
         if st.button("Submit"):
-            # First attempt → save as session answer key
-            if selected_set not in st.session_state.answer_keys:
-                st.session_state.answer_keys[selected_set] = user_answers
-                st.success("✅ First attempt saved as answer key (session only). Rerun to evaluate.")
-                return
-
-            # Next attempts → evaluate
-            correct_answers = st.session_state.answer_keys[selected_set]
             incorrect = []
-            for i, user_ans in enumerate(user_answers):
-                if user_ans == correct_answers[i]:
+            for i, row in df_q.iterrows():
+                correct_option_number = df_a.iloc[i]["correct_ans"]  # e.g., 1,2,3,4
+                correct_option_text = row[str(correct_option_number)]
+                if user_answers[i] == correct_option_text:
                     score += 1
                 else:
-                    incorrect.append((df.iloc[i]['question'], correct_answers[i]))
+                    incorrect.append((row['question'], correct_option_text))
 
             st.write(f"### ✅ Your Score: {score}/{total_questions}")
             if incorrect:
