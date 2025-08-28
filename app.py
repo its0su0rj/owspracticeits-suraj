@@ -30,11 +30,11 @@ def load_answers(ans_url):
 # Quiz sets (questions + answers)
 def get_quiz_sets():
     return {
-         "Set 1": {
+         "jan2025": {
              "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
              "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
          },
-         "Set 2": {
+         "coming soon...": {
              "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
              "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
          },
@@ -65,7 +65,7 @@ def get_quiz_sets():
     }
 
 def main():
-    st.title("📘 Current Affairs Quiz")
+    st.title("📘 Current Affairs Quiz by suraj")
 
     quiz_sets = get_quiz_sets()
     selected_set = st.selectbox("Select a quiz set:", list(quiz_sets.keys()))
