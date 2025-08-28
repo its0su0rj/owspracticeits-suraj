@@ -20,14 +20,20 @@ def load_questions(file_url, local_filename):
         return pd.DataFrame()
 
 # Fetch list of quiz sets
+
 def get_quiz_sets():
     quiz_sets = {
-         "Set 1": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february.csv",
-         "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set2.csv",
-         "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set3.csv",
-         "Set 4": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/ca4_set4.csv"
+         "Set 1": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
+         "Set 2": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
+         "Set 3": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
+         "Set 4": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025.csv",
+         "Set 5": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025.csv",
+         "Set 6": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025.csv",
+         "Set 7": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
+         "Set 8": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025.csv"
     }
     return quiz_sets
+
 
 # Main function to display the quiz
 def main():
