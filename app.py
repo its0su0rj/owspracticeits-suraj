@@ -180,7 +180,7 @@ def homepage():
 
     quiz_sets = get_quiz_sets()
     #st.subheader("📅 Monthly Quiz Sets")
-    st.subheader("📅 Monthly Quiz Sets:source KGS")
+    st.subheader("📅 Monthly Quiz Sets: (source KGS)")
     st.markdown("<p style='color:red; font-weight:bold;'>**CLIK 2 TIMES ON EACH SET</p>", unsafe_allow_html=True)
 
 
