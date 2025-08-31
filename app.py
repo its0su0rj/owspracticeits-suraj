@@ -30,31 +30,31 @@ def load_answers(ans_url):
 # Quiz sets (questions + answers)
 def get_quiz_sets():
     return {
-        "Jan 2025 - Set-1": {
+        "Jan2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
         },
-        "Feb 2025 - Set-1": {
+        "Feb2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
         },
-        "March 2025 - Set-1": {
+        "March2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025ans.csv"
         },
-        "April 2025 - Set-1": {
+        "April2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025ans.csv"
         },
-        "May 2025 - Set-1": {
+        "May2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025ans.csv"
         },
-        "July 2025 - Set-1": {
+        "July2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
         },
-        "Aug 2025 - Set-1": {
+        "Aug2025-Set1": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025ans.csv"
         }
@@ -69,11 +69,15 @@ def run_quiz(selected_set, quiz_sets):
         st.warning("⚠️ Data not available for this set.")
         return
 
+    # Back button at TOP
+    if st.button("⬅️ Back to Home"):
+        st.query_params.clear()
+        st.experimental_rerun()
+
+    st.subheader("Answer the questions:")
     total_questions = len(df_q)
     score = 0
     user_answers = []
-
-    st.subheader("Answer the questions:")
 
     for index, row in df_q.iterrows():
         st.write(f"**Q{index+1}: {row['question']}**")
@@ -84,7 +88,7 @@ def run_quiz(selected_set, quiz_sets):
     if st.button("Submit"):
         incorrect = []
         for i, row in df_q.iterrows():
-            correct_option_number = df_a.iloc[i]["correct_ans"]  # e.g., 1,2,3,4
+            correct_option_number = df_a.iloc[i]["correct_ans"]
             correct_option_text = row[str(correct_option_number)]
             if user_answers[i] == correct_option_text:
                 score += 1
@@ -104,44 +108,49 @@ def run_quiz(selected_set, quiz_sets):
 # Main App
 def main():
     st.title("📘 Current Affairs Quiz by Suraj")
-
     quiz_sets = get_quiz_sets()
 
-    if "selected_set" not in st.session_state:
-        st.session_state.selected_set = None
+    # Read query param
+    query_params = st.query_params
+    selected_set = query_params.get("set", None)
 
-    if st.session_state.selected_set is None:
+    if not selected_set:
+        # Home Page
         st.subheader("Choose a Quiz Set:")
 
-        # Homepage layout like your uploaded picture
         with st.container():
             st.markdown("### Monthly CA")
             cols = st.columns(3)
-            if cols[0].button("Jan 2025 - Set 1"):
-                st.session_state.selected_set = "Jan 2025 - Set-1"
-            if cols[1].button("Feb 2025 - Set 1"):
-                st.session_state.selected_set = "Feb 2025 - Set-1"
-            if cols[2].button("March 2025 - Set 1"):
-                st.session_state.selected_set = "March 2025 - Set-1"
+            if cols[0].button("Jan 2025 - Set 1", key="jan"):
+                st.query_params["set"] = "Jan2025-Set1"
+                st.experimental_rerun()
+            if cols[1].button("Feb 2025 - Set 1", key="feb"):
+                st.query_params["set"] = "Feb2025-Set1"
+                st.experimental_rerun()
+            if cols[2].button("March 2025 - Set 1", key="mar"):
+                st.query_params["set"] = "March2025-Set1"
+                st.experimental_rerun()
 
         with st.container():
             cols = st.columns(3)
-            if cols[0].button("April 2025 - Set 1"):
-                st.session_state.selected_set = "April 2025 - Set-1"
-            if cols[1].button("May 2025 - Set 1"):
-                st.session_state.selected_set = "May 2025 - Set-1"
-            if cols[2].button("July 2025 - Set 1"):
-                st.session_state.selected_set = "July 2025 - Set-1"
+            if cols[0].button("April 2025 - Set 1", key="apr"):
+                st.query_params["set"] = "April2025-Set1"
+                st.experimental_rerun()
+            if cols[1].button("May 2025 - Set 1", key="may"):
+                st.query_params["set"] = "May2025-Set1"
+                st.experimental_rerun()
+            if cols[2].button("July 2025 - Set 1", key="jul"):
+                st.query_params["set"] = "July2025-Set1"
+                st.experimental_rerun()
 
         with st.container():
             cols = st.columns(3)
-            if cols[0].button("Aug 2025 - Set 1"):
-                st.session_state.selected_set = "Aug 2025 - Set-1"
+            if cols[0].button("Aug 2025 - Set 1", key="aug"):
+                st.query_params["set"] = "Aug2025-Set1"
+                st.experimental_rerun()
 
     else:
-        run_quiz(st.session_state.selected_set, quiz_sets)
-        if st.button("🔙 Back to Home"):
-            st.session_state.selected_set = None
+        run_quiz(selected_set, quiz_sets)
 
 
 if __name__ == "__main__":
