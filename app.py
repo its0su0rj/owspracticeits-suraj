@@ -131,6 +131,7 @@ def run_quiz(selected_set, quiz_sets):
             st.session_state.submitted = True
 
     # --- If submitted: show results ---
+    
     if st.session_state.submitted and st.session_state.results:
         score = st.session_state.results["score"]
         incorrect = st.session_state.results["incorrect"]
@@ -144,6 +145,13 @@ def run_quiz(selected_set, quiz_sets):
         else:
             st.balloons()
             st.success("🎉 Perfect! All answers correct.")
+         # ✅ Extra Back to Home button at end
+        if st.button("⬅️ Back to Home", key="back_home_after_results"):
+           st.session_state.page = "home"
+           st.session_state.answers = {}
+           st.session_state.submitted = False
+           st.session_state.results = None
+   
 
 # -------------------
 # Homepage Layout
@@ -171,7 +179,10 @@ def homepage():
     """, unsafe_allow_html=True)
 
     quiz_sets = get_quiz_sets()
+    #st.subheader("📅 Monthly Quiz Sets")
     st.subheader("📅 Monthly Quiz Sets")
+    st.markdown("<p style='color:red; font-weight:bold;'>CLIK 2 TIMES ON EACH SET</p>", unsafe_allow_html=True)
+
 
     # ✅ Keep buttons in correct order & full width
     for set_name in quiz_sets.keys():
