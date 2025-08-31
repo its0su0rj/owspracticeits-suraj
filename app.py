@@ -155,6 +155,7 @@ def homepage():
     st.markdown("""
     <style>
     div.stButton > button {
+        width: 100%;  /* ✅ Full width button */
         background: linear-gradient(135deg, #4CAF50, #2196F3);
         color: white;
         font-weight: bold;
@@ -172,16 +173,14 @@ def homepage():
     quiz_sets = get_quiz_sets()
     st.subheader("📅 Monthly Quiz Sets")
 
-    cols = st.columns(2)
-    i = 0
+    # ✅ Keep buttons in correct order & full width
     for set_name in quiz_sets.keys():
-        if cols[i % 2].button(set_name, key=set_name):
+        if st.button(set_name, key=set_name):
             st.session_state.page = "quiz"
             st.session_state.selected_set = set_name
             st.session_state.answers = {}
             st.session_state.submitted = False
             st.session_state.results = None
-        i += 1
 
     st.markdown("---")
     st.subheader("🌍 BiharCA Section")
@@ -190,6 +189,7 @@ def homepage():
     st.markdown("---")
     st.subheader("📂 Topicwise Section")
     st.info("👉 Topicwise quizzes coming soon.")
+
 
 
 # -------------------
