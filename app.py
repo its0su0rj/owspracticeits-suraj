@@ -74,14 +74,15 @@ def get_quiz_sets():
 # Run Quiz Page
 # -------------------
 def run_quiz(selected_set, quiz_sets):
-    # --- Back to Home Button ---
     if st.button("⬅️ Back to Home"):
         st.session_state.page = "home"
-        st.experimental_rerun()
+        st.session_state.answers = {}
+        st.session_state.submitted = False
+        st.session_state.results = None
+        return
 
     st.subheader(f"📖 {selected_set} Quiz")
 
-    # Load data
     df_q = load_questions(quiz_sets[selected_set]["questions"])
     df_a = load_answers(quiz_sets[selected_set]["answers"])
 
@@ -91,7 +92,7 @@ def run_quiz(selected_set, quiz_sets):
 
     total_questions = len(df_q)
 
-    # --- Initialize session state ---
+    # --- Session state init ---
     if "answers" not in st.session_state:
         st.session_state.answers = {}
     if "submitted" not in st.session_state:
@@ -99,37 +100,37 @@ def run_quiz(selected_set, quiz_sets):
     if "results" not in st.session_state:
         st.session_state.results = None
 
-    # --- Questions UI ---
-    for index, row in df_q.iterrows():
-        st.write(f"**Q{index+1}: {row['question']}**")
-        options = [row['1'], row['2'], row['3'], row['4']]
+    # --- If not submitted: show quiz ---
+    if not st.session_state.submitted:
+        for index, row in df_q.iterrows():
+            st.write(f"**Q{index+1}: {row['question']}**")
+            options = [row['1'], row['2'], row['3'], row['4']]
+            st.session_state.answers[index] = st.radio(
+                f"Your answer for Q{index+1}:",
+                options,
+                key=f"{selected_set}_{index}"
+            )
 
-        # Answer saving (NO redirect to home now)
-        st.session_state.answers[index] = st.radio(
-            f"Your answer for Q{index+1}:",
-            options,
-            key=f"q_{selected_set}_{index}"
-        )
+        if st.button("✅ Submit"):
+            score = 0
+            incorrect = []
+            for i, row in df_q.iterrows():
+                correct_option_number = df_a.iloc[i]["correct_ans"]
+                correct_option_text = row[str(correct_option_number)]
+                user_answer = st.session_state.answers.get(i, None)
+                if user_answer == correct_option_text:
+                    score += 1
+                else:
+                    incorrect.append((row['question'], correct_option_text))
 
-    # --- Submit button ---
-    if st.button("✅ Submit"):
-        score = 0
-        incorrect = []
-        for i, row in df_q.iterrows():
-            correct_option_number = df_a.iloc[i]["correct_ans"]  # 1,2,3,4
-            correct_option_text = row[str(correct_option_number)]
-            user_answer = st.session_state.answers.get(i, None)
-            if user_answer == correct_option_text:
-                score += 1
-            else:
-                incorrect.append((row['question'], correct_option_text))
+            st.session_state.results = {
+                "score": score,
+                "incorrect": incorrect,
+                "total": total_questions
+            }
+            st.session_state.submitted = True
 
-        # Save results
-        st.session_state.results = {"score": score, "incorrect": incorrect, "total": total_questions}
-        st.session_state.submitted = True
-        st.experimental_rerun()
-
-    # --- Show Results ---
+    # --- If submitted: show results ---
     if st.session_state.submitted and st.session_state.results:
         score = st.session_state.results["score"]
         incorrect = st.session_state.results["incorrect"]
@@ -144,7 +145,6 @@ def run_quiz(selected_set, quiz_sets):
             st.balloons()
             st.success("🎉 Perfect! All answers correct.")
 
-
 # -------------------
 # Homepage Layout
 # -------------------
@@ -157,37 +157,38 @@ def homepage():
     i = 0
     for set_name in quiz_sets.keys():
         if cols[i % 2].button(set_name, key=set_name):
-            st.query_params["set"] = set_name
-            st.rerun()
+            st.session_state.page = "quiz"
+            st.session_state.selected_set = set_name
+            st.session_state.answers = {}
+            st.session_state.submitted = False
+            st.session_state.results = None
         i += 1
 
     st.markdown("---")
     st.subheader("🌍 BiharCA Section")
-    st.info("👉 Here you will get quizzes related to Bihar Current Affairs (Coming soon).")
+    st.info("👉 Bihar Current Affairs quizzes coming soon.")
 
     st.markdown("---")
     st.subheader("📂 Topicwise Section")
-    st.info("👉 Here you will get quizzes arranged topicwise (Coming soon).")
+    st.info("👉 Topicwise quizzes coming soon.")
 
 # -------------------
 # Main
 # -------------------
 def main():
-    quiz_sets = get_quiz_sets()
-    selected_set = st.query_params.get("set", None)
-    if isinstance(selected_set, list):
-        selected_set = selected_set[0]
+    if "page" not in st.session_state:
+        st.session_state.page = "home"
+    if "selected_set" not in st.session_state:
+        st.session_state.selected_set = None
 
-    if not selected_set:
+    quiz_sets = get_quiz_sets()
+
+    if st.session_state.page == "home":
         homepage()
+    elif st.session_state.page == "quiz" and st.session_state.selected_set:
+        run_quiz(st.session_state.selected_set, quiz_sets)
     else:
-        if selected_set in quiz_sets:
-            run_quiz(selected_set, quiz_sets)
-        else:
-            st.error("⚠️ Invalid quiz set selected. Please go back to Home.")
-            if st.button("⬅️ Back to Home"):
-                st.query_params.clear()
-                st.rerun()
+        homepage()
 
 if __name__ == "__main__":
     main()
