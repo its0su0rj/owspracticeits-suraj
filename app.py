@@ -118,8 +118,7 @@ def run_quiz(selected_set, quiz_sets):
                 incorrect.append((row['question'], correct_option_text))
 
         st.session_state.results = {"score": score, "incorrect": incorrect, "total": total_questions}
-        st.session_state.submitted = True
-        st.experimental_rerun()
+        st.session_state.submitted = True   # ✅ bas yahi tak, rerun hata diya
 
     if st.session_state.submitted and st.session_state.results:
         score = st.session_state.results["score"]
