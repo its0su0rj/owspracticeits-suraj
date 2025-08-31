@@ -74,7 +74,10 @@ def get_quiz_sets():
 # Run Quiz Page
 # -------------------
 def run_quiz(selected_set, quiz_sets):
-    st.markdown("### ⬅️ [Back to Home](?home=true)", unsafe_allow_html=True)
+    # --- Back to Home Button ---
+    if st.button("⬅️ Back to Home"):
+        st.session_state.page = "home"
+        st.experimental_rerun()
 
     st.subheader(f"📖 {selected_set} Quiz")
 
@@ -87,28 +90,50 @@ def run_quiz(selected_set, quiz_sets):
         return
 
     total_questions = len(df_q)
-    score = 0
-    user_answers = []
 
+    # --- Initialize session state ---
+    if "answers" not in st.session_state:
+        st.session_state.answers = {}
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
+    if "results" not in st.session_state:
+        st.session_state.results = None
+
+    # --- Questions UI ---
     for index, row in df_q.iterrows():
         st.write(f"**Q{index+1}: {row['question']}**")
         options = [row['1'], row['2'], row['3'], row['4']]
-        user_answer = st.radio(
+
+        # Answer saving (NO redirect to home now)
+        st.session_state.answers[index] = st.radio(
             f"Your answer for Q{index+1}:",
             options,
-            key=f"{selected_set}_{index}"
+            key=f"q_{selected_set}_{index}"
         )
-        user_answers.append(user_answer)
 
+    # --- Submit button ---
     if st.button("✅ Submit"):
+        score = 0
         incorrect = []
         for i, row in df_q.iterrows():
-            correct_option_number = df_a.iloc[i]["correct_ans"]  # e.g., 1,2,3,4
+            correct_option_number = df_a.iloc[i]["correct_ans"]  # 1,2,3,4
             correct_option_text = row[str(correct_option_number)]
-            if user_answers[i] == correct_option_text:
+            user_answer = st.session_state.answers.get(i, None)
+            if user_answer == correct_option_text:
                 score += 1
             else:
                 incorrect.append((row['question'], correct_option_text))
+
+        # Save results
+        st.session_state.results = {"score": score, "incorrect": incorrect, "total": total_questions}
+        st.session_state.submitted = True
+        st.experimental_rerun()
+
+    # --- Show Results ---
+    if st.session_state.submitted and st.session_state.results:
+        score = st.session_state.results["score"]
+        incorrect = st.session_state.results["incorrect"]
+        total_questions = st.session_state.results["total"]
 
         st.success(f"### 🎯 Your Score: {score}/{total_questions}")
         if incorrect:
@@ -118,6 +143,7 @@ def run_quiz(selected_set, quiz_sets):
         else:
             st.balloons()
             st.success("🎉 Perfect! All answers correct.")
+
 
 # -------------------
 # Homepage Layout
