@@ -87,25 +87,38 @@ def run_quiz(selected_set, quiz_sets):
         return
 
     total_questions = len(df_q)
-    score = 0
-    user_answers = []
 
+    # Initialize session state
+    if "answers" not in st.session_state:
+        st.session_state.answers = {}
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
+
+    # Show questions
     for index, row in df_q.iterrows():
         st.write(f"**Q{index+1}: {row['question']}**")
         options = [row['1'], row['2'], row['3'], row['4']]
-        user_answer = st.radio(
+
+        # Save answer in session state
+        st.session_state.answers[index] = st.radio(
             f"Your answer for Q{index+1}:",
             options,
             key=f"{selected_set}_{index}"
         )
-        user_answers.append(user_answer)
 
+    # Submit button
     if st.button("✅ Submit"):
+        st.session_state.submitted = True
+
+    # Show results if submitted
+    if st.session_state.submitted:
+        score = 0
         incorrect = []
         for i, row in df_q.iterrows():
             correct_option_number = df_a.iloc[i]["correct_ans"]  # e.g., 1,2,3,4
             correct_option_text = row[str(correct_option_number)]
-            if user_answers[i] == correct_option_text:
+            user_answer = st.session_state.answers.get(i, None)
+            if user_answer == correct_option_text:
                 score += 1
             else:
                 incorrect.append((row['question'], correct_option_text))
@@ -118,6 +131,8 @@ def run_quiz(selected_set, quiz_sets):
         else:
             st.balloons()
             st.success("🎉 Perfect! All answers correct.")
+
+
 
 # -------------------
 # Homepage Layout
