@@ -88,40 +88,48 @@ def run_quiz(selected_set, quiz_sets):
 
     total_questions = len(df_q)
 
-    # Initialize session state
+    # --- Initialize session state ---
     if "answers" not in st.session_state:
         st.session_state.answers = {}
     if "submitted" not in st.session_state:
         st.session_state.submitted = False
+    if "results" not in st.session_state:
+        st.session_state.results = None
 
-    # Show questions
+    # --- Questions UI ---
     for index, row in df_q.iterrows():
         st.write(f"**Q{index+1}: {row['question']}**")
         options = [row['1'], row['2'], row['3'], row['4']]
 
-        # Save answer in session state
+        # Answer saving
         st.session_state.answers[index] = st.radio(
             f"Your answer for Q{index+1}:",
             options,
             key=f"{selected_set}_{index}"
         )
 
-    # Submit button
+    # --- Submit button ---
     if st.button("✅ Submit"):
-        st.session_state.submitted = True
-
-    # Show results if submitted
-    if st.session_state.submitted:
         score = 0
         incorrect = []
         for i, row in df_q.iterrows():
-            correct_option_number = df_a.iloc[i]["correct_ans"]  # e.g., 1,2,3,4
+            correct_option_number = df_a.iloc[i]["correct_ans"]  # 1,2,3,4
             correct_option_text = row[str(correct_option_number)]
             user_answer = st.session_state.answers.get(i, None)
             if user_answer == correct_option_text:
                 score += 1
             else:
                 incorrect.append((row['question'], correct_option_text))
+
+        # Save results in session_state
+        st.session_state.results = {"score": score, "incorrect": incorrect, "total": total_questions}
+        st.session_state.submitted = True
+
+    # --- Show Results ---
+    if st.session_state.submitted and st.session_state.results:
+        score = st.session_state.results["score"]
+        incorrect = st.session_state.results["incorrect"]
+        total_questions = st.session_state.results["total"]
 
         st.success(f"### 🎯 Your Score: {score}/{total_questions}")
         if incorrect:
