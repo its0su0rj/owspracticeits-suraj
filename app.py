@@ -1,90 +1,107 @@
 import streamlit as st
 import pandas as pd
-import requests
-from io import StringIO
 
 # ===========================
-# Load Questions CSV
+# Load Questions & Answers
 # ===========================
-def load_questions(file_url):
+def load_questions(file):
     try:
-        response = requests.get(file_url)
-        response.raise_for_status()
-        csv_data = StringIO(response.text)
-        df = pd.read_csv(csv_data, quotechar='"', skipinitialspace=True)
-        return df
-    except Exception as e:
-        st.error(f"Error loading data: {e}")
+        return pd.read_csv(file)
+    except Exception:
+        return pd.DataFrame()
+
+def load_answers(file):
+    try:
+        return pd.read_csv(file)
+    except Exception:
         return pd.DataFrame()
 
 # ===========================
-# Load Answers CSV
-# ===========================
-def load_answers(ans_url):
-    try:
-        response = requests.get(ans_url)
-        response.raise_for_status()
-        csv_data = StringIO(response.text)
-        df = pd.read_csv(csv_data)
-        return df
-    except Exception as e:
-        st.error(f"Error loading answers: {e}")
-        return pd.DataFrame()
-
-# ===========================
-# Quiz Sets Dictionary
+# Define Quiz Sets
 # ===========================
 def get_quiz_sets():
-    return {
-        # JANUARY
-        "Jan2025-Set1": {
-            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
-            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
-        },
-        "Jan2025-Set2": {
-            "questions": "https://raw.githubusercontent.com/.../january2025_set2.csv",
-            "answers":   "https://raw.githubusercontent.com/.../january2025_set2ans.csv"
-        },
-        "Jan2025-Set3": {
-            "questions": "https://raw.githubusercontent.com/.../january2025_set3.csv",
-            "answers":   "https://raw.githubusercontent.com/.../january2025_set3ans.csv"
-        },
+    quiz_sets = {}
 
-        # FEBRUARY
-        "Feb2025-Set1": {
-            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
-            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
-        },
-        "Feb2025-Set2": {
-            "questions": "https://raw.githubusercontent.com/.../february2025_set2.csv",
-            "answers":   "https://raw.githubusercontent.com/.../february2025_set2ans.csv"
-        },
-        "Feb2025-Set3": {
-            "questions": "https://raw.githubusercontent.com/.../february2025_set3.csv",
-            "answers":   "https://raw.githubusercontent.com/.../february2025_set3ans.csv"
-        },
+    months = ["Jan2025", "Feb2025", "Mar2025", "Apr2025",
+              "May2025", "Jun2025", "Jul2025", "Aug2025"]
 
-        # Add March – August similar way...
-        
-        # BIHAR CA
-        "BiharCA-Set1": {
-            "questions": "https://raw.githubusercontent.com/.../biharca_set1.csv",
-            "answers":   "https://raw.githubusercontent.com/.../biharca_set1ans.csv"
-        },
+    for m in months:
+        for i in range(1, 4):
+            quiz_sets[f"{m}-Set{i}"] = {
+                "questions": f"data/{m.lower()}_set{i}_q.csv",
+                "answers": f"data/{m.lower()}_set{i}_a.csv"
+            }
 
-        # TOPICWISE
-        "Topicwise-Economy": {
-            "questions": "https://raw.githubusercontent.com/.../topicwise_economy.csv",
-            "answers":   "https://raw.githubusercontent.com/.../topicwise_economyans.csv"
-        },
-        "Topicwise-Sports": {
-            "questions": "https://raw.githubusercontent.com/.../topicwise_sports.csv",
-            "answers":   "https://raw.githubusercontent.com/.../topicwise_sportsans.csv"
-        }
+    # Bihar CA
+    quiz_sets["BiharCA-Set1"] = {
+        "questions": "data/bihar_set1_q.csv",
+        "answers": "data/bihar_set1_a.csv"
     }
 
+    # Topicwise
+    quiz_sets["Topicwise-Economy"] = {
+        "questions": "data/topicwise_economy_q.csv",
+        "answers": "data/topicwise_economy_a.csv"
+    }
+    quiz_sets["Topicwise-Sports"] = {
+        "questions": "data/topicwise_sports_q.csv",
+        "answers": "data/topicwise_sports_a.csv"
+    }
+
+    return quiz_sets
+
 # ===========================
-# Run Quiz Page
+# Homepage Layout (Styled)
+# ===========================
+def homepage():
+    st.subheader("📌 Choose a Quiz Set")
+
+    months = ["Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025",
+              "May 2025", "Jun 2025", "Jul 2025", "Aug 2025"]
+
+    for m in months:
+        st.markdown(f"""
+        <div style='padding: 15px; border-radius: 12px; margin-bottom: 15px; background-color: #f5f5f5;'>
+            <h4 style='margin-bottom:10px;'>{m}</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+        cols = st.columns(3)
+        for i in range(3):
+            with cols[i]:
+                if st.button(f"Set {i+1}", use_container_width=True, key=f"{m}_Set{i+1}"):
+                    st.query_params.update({"set": f"{m.replace(' ', '')}-Set{i+1}"})
+                    st.rerun()
+
+    # Bihar CA Section
+    st.markdown("""
+    <div style='padding: 15px; border-radius: 12px; margin-bottom: 15px; background-color: #e9f7ef;'>
+        <h4 style='margin-bottom:10px;'>🟢 Bihar Current Affairs</h4>
+    </div>
+    """, unsafe_allow_html=True)
+
+    cols = st.columns(3)
+    if cols[0].button("Bihar Set 1", use_container_width=True):
+        st.query_params.update({"set": "BiharCA-Set1"})
+        st.rerun()
+
+    # Topicwise Section
+    st.markdown("""
+    <div style='padding: 15px; border-radius: 12px; margin-bottom: 15px; background-color: #e8f4fd;'>
+        <h4 style='margin-bottom:10px;'>🔵 Topicwise Current Affairs</h4>
+    </div>
+    """, unsafe_allow_html=True)
+
+    cols = st.columns(3)
+    if cols[0].button("Economy", use_container_width=True):
+        st.query_params.update({"set": "Topicwise-Economy"})
+        st.rerun()
+    if cols[1].button("Sports", use_container_width=True):
+        st.query_params.update({"set": "Topicwise-Sports"})
+        st.rerun()
+
+# ===========================
+# Run Quiz Page (with Back Fix)
 # ===========================
 def run_quiz(selected_set, quiz_sets):
     st.subheader(f"📝 {selected_set} Quiz")
@@ -94,95 +111,44 @@ def run_quiz(selected_set, quiz_sets):
     if df_q.empty or df_a.empty:
         st.warning("⚠️ Data not available for this set.")
         if st.button("⬅️ Back to Home"):
-            st.query_params.clear()
+            st.query_params.update({"set": None})
             st.rerun()
         return
 
-    total_questions = len(df_q)
     score = 0
-    user_answers = []
+    for idx, row in df_q.iterrows():
+        q = row.get("Question", "")
+        options = [row.get("Option1", ""), row.get("Option2", ""),
+                   row.get("Option3", ""), row.get("Option4", "")]
+        correct = df_a.iloc[idx].get("Answer", "")
 
-    st.write("### Answer the questions:")
-
-    for index, row in df_q.iterrows():
-        st.write(f"**Q{index+1}: {row['question']}**")
-        options = [row['1'], row['2'], row['3'], row['4']]
-        user_answer = st.radio(
-            f"Your answer for Q{index+1}:", options, key=f"{selected_set}_{index}"
-        )
-        user_answers.append(user_answer)
-
-    if st.button("Submit"):
-        incorrect = []
-        for i, row in df_q.iterrows():
-            correct_option_number = df_a.iloc[i]["correct_ans"]  # e.g., 1,2,3,4
-            correct_option_text = row[str(correct_option_number)]
-            if user_answers[i] == correct_option_text:
+        st.write(f"**Q{idx+1}. {q}**")
+        user_ans = st.radio("Choose:", options, key=f"q{idx}")
+        if st.button(f"Submit Q{idx+1}", key=f"submit{idx}"):
+            if user_ans == correct:
+                st.success("✅ Correct!")
                 score += 1
             else:
-                incorrect.append((row['question'], correct_option_text))
+                st.error(f"❌ Wrong! Correct: {correct}")
 
-        st.write(f"### ✅ Your Score: {score}/{total_questions}")
-        if incorrect:
-            st.error("❌ Incorrect Answers:")
-            for q, correct in incorrect:
-                st.write(f"**Q:** {q}")
-                st.write(f"**Correct:** {correct}")
-        else:
-            st.balloons()
-            st.success("🎉 Perfect! All answers correct.")
+    st.info(f"Your Score: {score}/{len(df_q)}")
 
-    # Back button
     if st.button("⬅️ Back to Home"):
-        st.query_params.clear()
+        st.query_params.update({"set": None})
         st.rerun()
 
 # ===========================
-# Homepage Layout
-# ===========================
-def homepage():
-    st.subheader("📌 Choose a Quiz Set")
-
-    # Monthwise Layout
-    months = ["Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025", "May 2025", "Jun 2025", "Jul 2025", "Aug 2025"]
-
-    for m in months:
-        st.markdown(f"### {m}")
-        cols = st.columns(3)
-        for i in range(3):
-            if cols[i].button(f"Set {i+1}", key=f"{m}_Set{i+1}"):
-                st.query_params["set"] = f"{m.replace(' ', '')}-Set{i+1}"
-                st.rerun()
-
-    # Bihar CA Section
-    st.markdown("### 🟢 Bihar Current Affairs")
-    cols = st.columns(3)
-    if cols[0].button("Bihar Set 1"):
-        st.query_params["set"] = "BiharCA-Set1"
-        st.rerun()
-
-    # Topicwise Section
-    st.markdown("### 🔵 Topicwise Current Affairs")
-    cols = st.columns(3)
-    if cols[0].button("Economy"):
-        st.query_params["set"] = "Topicwise-Economy"
-        st.rerun()
-    if cols[1].button("Sports"):
-        st.query_params["set"] = "Topicwise-Sports"
-        st.rerun()
-
-# ===========================
-# Main Function
+# Main App
 # ===========================
 def main():
     st.title("📘 Current Affairs Quiz by Suraj")
     quiz_sets = get_quiz_sets()
 
     selected_set = st.query_params.get("set", None)
-    if isinstance(selected_set, list):  # FIX for query params
+    if isinstance(selected_set, list):  # fix for list return
         selected_set = selected_set[0]
 
-    if not selected_set:
+    if not selected_set or selected_set == "None":
         homepage()
     else:
         if selected_set in quiz_sets:
@@ -190,7 +156,7 @@ def main():
         else:
             st.error("⚠️ Invalid quiz set selected. Please go back to Home.")
             if st.button("⬅️ Back to Home"):
-                st.query_params.clear()
+                st.query_params.update({"set": None})
                 st.rerun()
 
 if __name__ == "__main__":
