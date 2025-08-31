@@ -111,5 +111,7 @@ def main():
                 st.balloons()
                 st.success("🎉 Perfect! All answers correct.")
 
-if _name_ == "_main_":
+#if _name_ == "_main_":
+    main()
+if __name__ == "__main__":
     main()
