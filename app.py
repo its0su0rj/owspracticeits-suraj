@@ -151,26 +151,27 @@ def run_quiz(selected_set, quiz_sets):
 def homepage():
     st.header("📘 Current Affairs Quiz by Suraj")
 
-    # CSS for colored buttons
+    # Gradient Colorful Buttons
     st.markdown("""
-        <style>
-        div.stButton > button {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-            border-radius: 10px;
-            padding: 10px 20px;
-        }
-        div.stButton > button:hover {
-            background-color: #45a049;
-            color: white;
-        }
-        </style>
+    <style>
+    div.stButton > button {
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 0.6em 1.2em;
+        transition: 0.3s;
+    }
+    div.stButton > button:hover {
+        background: linear-gradient(135deg, #45a049, #1976D2);
+        transform: scale(1.05);
+    }
+    </style>
     """, unsafe_allow_html=True)
 
     quiz_sets = get_quiz_sets()
-
     st.subheader("📅 Monthly Quiz Sets")
+
     cols = st.columns(2)
     i = 0
     for set_name in quiz_sets.keys():
@@ -189,6 +190,7 @@ def homepage():
     st.markdown("---")
     st.subheader("📂 Topicwise Section")
     st.info("👉 Topicwise quizzes coming soon.")
+
 
 # -------------------
 # Main
