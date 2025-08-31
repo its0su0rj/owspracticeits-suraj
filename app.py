@@ -36,7 +36,7 @@ def load_answers(ans_url):
 # -------------------
 def get_quiz_sets():
     return {
-        "January 2025": {
+        "January 2025  196Q": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
         },
