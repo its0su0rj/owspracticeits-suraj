@@ -105,11 +105,17 @@ def run_quiz(selected_set, quiz_sets):
         for index, row in df_q.iterrows():
             st.write(f"**Q{index+1}: {row['question']}**")
             options = [row['1'], row['2'], row['3'], row['4']]
-            st.session_state.answers[index] = st.radio(
+            # restore previous choice if available
+            prev_choice = st.session_state.answers.get(index, None)
+            choice = st.radio(
                 f"Your answer for Q{index+1}:",
                 options,
+                index=options.index(prev_choice) if prev_choice in options else 0,
                 key=f"{selected_set}_{index}"
             )
+            st.session_state.answers[index] = choice
+
+            
 
         if st.button("✅ Submit"):
             score = 0
