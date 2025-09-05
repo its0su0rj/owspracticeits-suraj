@@ -64,9 +64,9 @@ def get_quiz_sets():
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
         },
-        "August 2025coming": {
-            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025.csv",
-            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/august2025ans.csv"
+        "BIHAR CURRENT AFFAIRS": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharca.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharcaans.csv"
         }
     }
 
