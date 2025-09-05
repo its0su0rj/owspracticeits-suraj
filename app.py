@@ -64,7 +64,7 @@ def get_quiz_sets():
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
         },
-        "BIHAR CURRENT AFFAIRS": {
+        "BIHAR CURRENT AFFAIRS 175Q": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharca.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharcaans.csv"
         }
