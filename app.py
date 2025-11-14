@@ -83,7 +83,7 @@ if page == "journey":
     st.markdown("<div class='page-header'>🌈 Journey — From Little Steps to Beautiful Love</div>", unsafe_allow_html=True)
 
     # YOU WILL WRITE REAL QUESTIONS + MESSAGES + SONG NAMES HERE
-    reveal_block("page1.1", "Write your question here…", "ans1", "Your beautiful message here…", "song1")
+    reveal_block("page1.1", "Type the number which is my favourite ", "15", "Your beautiful message here…", "song1")
     reveal_block("page1.2", "Write question 2…", "ans2", "Message 2…", "song2")
     reveal_block("page1.3", "Write question 3…", "ans3", "Message 3…", "song3")
     reveal_block("page1.4", "Write question 4…", "ans4", "Message 4…", "song4")
