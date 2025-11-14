@@ -15,7 +15,7 @@ st.set_page_config(page_title="🎉 Happy Birthday", layout="wide")
 ITEMS_PER_PAGE = 4
 
 QUESTIONS = {
-    1: ["(Write question 1 for page 1)", "(Write question 2 for page 1)", "(Write question 3 for page 1)", "(Write question 4 for page 1)"],
+    1: ["(my favourite number)", "(Write question 2 for page 1)", "(Write question 3 for page 1)", "(Write question 4 for page 1)"],
     2: ["(Write question 1 for page 2)", "(Write question 2 for page 2)", "(Write question 3 for page 2)", "(Write question 4 for page 2)"],
     3: ["(Write question 1 for page 3)", "(Write question 2 for page 3)", "(Write question 3 for page 3)", "(Write question 4 for page 3)"],
     4: ["(Write question 1 for page 4)", "(Write question 2 for page 4)", "(Write question 3 for page 4)", "(Write question 4 for page 4)"],
@@ -23,7 +23,7 @@ QUESTIONS = {
 
 # Exact answers (case-insensitive). Fill these or the app will tell you to configure the slot.
 ANSWERS = {
-    1: ["ans1", "ans2", "ans3", "ans4"],
+    1: ["15", "ans2", "ans3", "ans4"],
     2: ["ans1", "ans2", "ans3", "ans4"],
     3: ["ans1", "ans2", "ans3", "ans4"],
     4: ["ans1", "ans2", "ans3", "ans4"],
