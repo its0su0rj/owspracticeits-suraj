@@ -1,34 +1,44 @@
 # app.py
-# Fixed final version — safe JS injection and full features
+# Final: loads images & songs directly from GitHub raw URLs for repo its0su0rj/owspracticeits-suraj
+# Place this file in repo root. Ensure images/ and songs/ files exist in that repo.
 import streamlit as st
 from PIL import Image, ImageOps
-import os, base64, json
+import requests, io, os, json, base64
+
+# --------------- CONFIG ---------------
+REPO_OWNER = "its0su0rj"
+REPO_NAME  = "owspracticeits-suraj"
+BRANCH     = "main"   # change if your default branch is different
+
+RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
+
+# UI / behavior
+ITEMS_PER_PAGE = 4
 
 st.set_page_config(page_title="🎉 Happy Birthday", layout="wide")
 
-# ---------------- Editable content ----------------
+# --------------- CONTENT YOU WANTED ----------------
 QUESTIONS_PAGE1 = [
     "1. In childhood you were cute or supercute? (Write 'cute' or 'supercute')",
     "2. Best duo... with whom? (Write 'ma' or 'life partner')",
-    "3. First time rakhi trip: which top color did you wear? (red or black)",
-    "4. You looked gorgeous in Chhath — more beautiful in evening or morning?"
+    "3. Remember the first Rakhi trip — which colored top? (red or black)",
+    "4. You looked gorgeous during Chhath — more beautiful in evening or morning?"
 ]
 ANSWERS_PAGE1 = ["supercute", "ma", "red", "evening"]  # case-insensitive
 
+# Prewritten romantic messages (auto-filled for pages 2..4)
 MESSAGES_PAGE2 = [
     "Your intelligence sparkles like stars; your beauty only highlights it. You are flawless.",
     "Confidence and kindness — you wear them both effortlessly. I admire you every day.",
     "Your laugh breaks the clouds away — everything’s brighter with you in it.",
     "You are a radiant presence; the world is softer when you smile."
 ]
-
 MESSAGES_PAGE3 = [
     "This memory is a warm lamp in my heart — forever glowing because of you.",
     "Every photo with you is a chapter of joy I read again and again.",
     "Your laughter in these moments still lives in my chest — soft and warm.",
     "I fall for you again in every memory; thank you for being my favorite."
 ]
-
 MESSAGES_PAGE4 = [
     "The future looks golden because you will shine in everything you do.",
     "I see travel, laughter, growth and us — all painted with your light.",
@@ -36,12 +46,12 @@ MESSAGES_PAGE4 = [
     "We'll turn tiny moments into a grand love story — and I can't wait."
 ]
 
-SONG_SLOT_FILES = ["song1.mp3", "song2.mp3", "song3.mp3", "song4.mp3"]
-LAST_SONG_FILE = "lastsong.mp3"
-BACKGROUND_FILE = "background.mp3"
-ITEMS_PER_PAGE = 4
+# Song hints / mapping for page1 (slot -> hint filename). We'll try multiple patterns for robustness.
+SONG_HINTS_PAGE1 = ["song1.mp3", "song2.mp3", "song3.mp3", "song4.mp3"]
+BACKGROUND_SONG = "background.mp3"
+LAST_SONG = "lastsong.mp3"
 
-# ---------------- Styling & effects ----------------
+# --------------- STYLING ---------------
 st.markdown("""
 <style>
 .main-title {text-align:center; font-size:44px; color:#ff2d6f; font-weight:900; margin-bottom:6px;}
@@ -62,31 +72,95 @@ button[kind="primary"], button[kind="secondary"], .stButton>button {
 .typewriter { font-size:18px; color:#c81d62; font-weight:700; white-space: pre-wrap; }
 .page-header { text-align:center; font-size:28px; color:#ff3b6b; margin-top:10px; margin-bottom:8px; font-weight:800; }
 </style>
-
 <div class="heart">💖</div>
 <div class="sparkle" style="left:20%; animation: fall 6s linear infinite;">✨</div>
 <div class="sparkle" style="left:40%; animation: fall 7s linear infinite;">🌟</div>
 <div class="sparkle" style="left:60%; animation: fall 5.5s linear infinite;">💫</div>
 """, unsafe_allow_html=True)
 
-# ---------------- Background music injection (optional) ----------------
-def inject_background(path=os.path.join("songs", BACKGROUND_FILE)):
-    if os.path.exists(path):
-        with open(path, "rb") as f:
-            data = base64.b64encode(f.read()).decode()
+# --------------- HELPERS: fetch raw bytes from GitHub ---------------
+def raw_url(path):
+    """Return full raw URL for a file path in the repo."""
+    return RAW_BASE + path
+
+def try_fetch_bytes(path):
+    """Try GET raw URL, return bytes if 200 else None."""
+    url = raw_url(path)
+    try:
+        r = requests.get(url, timeout=12)
+        if r.status_code == 200:
+            return r.content
+    except Exception:
+        return None
+    return None
+
+def fetch_image_from_repo(base_name):
+    """Try several variants for image: images/<base>.ext or images/<base_underscore>.ext"""
+    exts = [".jpg", ".jpeg", ".png", ".webp"]
+    candidates = []
+    # prefer dot variant like Page1.1
+    candidates += [f"images/{base_name}{e}" for e in exts]
+    # underscore variant
+    candidates += [f"images/{base_name.replace('.', '_')}{e}" for e in exts]
+    for p in candidates:
+        b = try_fetch_bytes(p)
+        if b:
+            return b, p  # bytes, path used
+    return None, None
+
+def fetch_song_from_repo(base_name):
+    exts = [".mp3", ".wav", ".ogg"]
+    # patterns to try: songs/<hint>, songs/<base>
+    candidates = []
+    candidates += [f"songs/{base_name}"]
+    # if base_name has extension already, try as-is; otherwise add exts
+    if os.path.splitext(base_name)[1]:
+        candidates += [f"songs/{base_name}"]
+    else:
+        candidates += [f"songs/{base_name}{e}" for e in exts]
+        candidates += [f"songs/{base_name.replace('.', '_')}{e}" for e in exts]
+    for p in candidates:
+        b = try_fetch_bytes(p)
+        if b:
+            return b, p
+    return None, None
+
+def stream_image_bytes(image_bytes):
+    """Open bytes as PIL Image and show via st.image"""
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img = ImageOps.exif_transpose(img)
+        st.image(img, use_column_width=True)
+    except Exception:
+        st.error("Found image bytes but couldn't decode image.")
+
+def stream_audio_bytes(audio_bytes):
+    try:
+        st.audio(audio_bytes, format="audio/mp3")
+    except Exception:
+        # fallback: try raw URL streaming (rare)
+        st.error("Could not play audio bytes directly.")
+
+# --------------- Background music injection (small floating player) ---------------
+def inject_background_music():
+    # try background in songs/background.mp3 or raw filename
+    b, p = fetch_song_from_repo(BACKGROUND_SONG)
+    if b:
+        # embed base64 like earlier
+        b64 = base64.b64encode(b).decode()
         html = f"""
         <audio autoplay loop controls style="position:fixed; bottom:16px; right:16px; width:260px; z-index:9999; opacity:0.92;">
-            <source src="data:audio/mp3;base64,{data}" type="audio/mp3">
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
         </audio>
         """
         st.markdown(html, unsafe_allow_html=True)
 
-inject_background()
+inject_background_music()
 
+# --------------- Header and navigation ---------------
 st.markdown("<div class='main-title'>🎉 Happy Birthday! 🎉</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>A little interactive journey — unlock images, messages & songs ✨</div>", unsafe_allow_html=True)
 
-# ---------------- Page navigation buttons ----------------
 if 'page' not in st.session_state:
     st.session_state.page = "home"
 
@@ -103,47 +177,11 @@ if st.session_state.page == "home":
     with c5:
         if st.button("💌 My Last Message", key="btn_letter"): st.session_state.page = "letter"
 if st.session_state.page == "home":
-    st.info("Click a section to begin — Journey, Qualities, Memories, Future, or My Last Message.")
+    st.info("Click any section to begin — Journey, Qualities, Memories, Future or My Last Message")
 
-# ---------------- Utilities ----------------
-def find_image(base_name):
-    exts = [".jpg", ".jpeg", ".png", ".webp"]
-    variants = [base_name, base_name.replace(".", "_"), base_name.replace("_", ".")]
-    for v in variants:
-        for e in exts:
-            path = os.path.join("images", v + e)
-            if os.path.exists(path):
-                return path
-    return None
-
-def find_song(base_name):
-    variants = [base_name, base_name.replace(".", "_"), base_name.replace("_", ".")]
-    exts = [".mp3", ".wav", ".ogg"]
-    for v in variants:
-        for e in exts:
-            path = os.path.join("songs", v + e)
-            if os.path.exists(path):
-                return path
-    return None
-
-def play_song_by_path(path):
-    try:
-        with open(path, "rb") as f:
-            st.audio(f.read(), format="audio/mp3")
-    except Exception:
-        st.error("Couldn't play the song file.")
-
-def show_confetti():
-    st.components.v1.html("""
-    <canvas id='c' style='position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;'></canvas>
-    <script src='https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js'></script>
-    <script>var myConfetti = confetti.create(document.getElementById('c'), { resize: true, useWorker: true });
-           myConfetti({particleCount: 220, spread: 160, origin: {y:0.6}});</script>
-    """, height=0)
-
-# Typewriter-safe HTML generator (uses json.dumps to escape message)
-def typewriter_html(msg, uid):
-    js_text = json.dumps(msg)   # safe JS string literal
+# --------------- Utility: safe typewriter HTML ---------------
+def typewriter_html_safe(text, uid):
+    js_text = json.dumps(text)  # safely escaped JS string
     html = f"""
     <div class="typewriter"><span id="{uid}"></span></div>
     <script>
@@ -154,95 +192,96 @@ def typewriter_html(msg, uid):
         if(i < txt.length){{
           el.innerHTML += txt.charAt(i);
           i++;
-          setTimeout(typeWriter, 20);
+          setTimeout(typeWriter, 18);
         }}
       }})();
     </script>
     """
     return html
 
-# ---------------- Page 1 (Journey) with questions ----------------
-def page_journey():
-    st.markdown("<div class='page-header'>🌈 Journey — From Childhood to Today</div>", unsafe_allow_html=True)
-    for idx in range(1, ITEMS_PER_PAGE + 1):
-        base = f"page1.{idx}"
-        st.markdown("<div class='glow-box'>", unsafe_allow_html=True)
-        question = QUESTIONS_PAGE1[idx - 1]
-        st.markdown(f"<div style='font-weight:700; color:#c81d62; margin-bottom:6px;'>{question}</div>", unsafe_allow_html=True)
-        key_input = f"p1_input_{idx}"
-        key_submit = f"p1_submit_{idx}"
-        key_reveal = f"p1_revealed_{idx}"
-        user = st.text_input("", key=key_input, placeholder="Type answer and press Submit")
-        if st.button("Submit", key=key_submit):
-            if user.strip().lower() == ANSWERS_PAGE1[idx - 1].lower():
-                st.session_state[key_reveal] = True
-            else:
-                st.error("Not quite — try again 🥺")
-        if st.session_state.get(key_reveal, False):
-            img_path = find_image(base)
-            if img_path:
-                try:
-                    img = Image.open(img_path); img = ImageOps.exif_transpose(img)
-                    st.image(img, use_column_width=True)
-                except Exception:
-                    st.error("Image found but couldn't be opened.")
-            else:
-                st.info(f"Place the image file named like images/{base}.jpg (or underscore variant)")
-            page1_messages = [
-                "From your earliest days you shone — supercute doesn't capture your little miracle glow. Your eyes told stories before words did.",
-                "Your bond with Ma is woven of lullabies, warmth and unending care. That love made you who you are — tender, strong and luminous.",
-                "That red top moment — I remember how the world paused: that color met your glow and created a sun that day. Pure fire.",
-                "Evening lights wrap your face like poetry. No one captures dusk the way you do — soft, radiant and unforgettable."
-            ]
-            msg = page1_messages[idx - 1]
-            st.components.v1.html(typewriter_html(msg, f"p1_msg_{idx}"), height=90)
-            # song: check hint file then base name
-            song_hint = SONG_SLOT_FILES[idx - 1] if idx - 1 < len(SONG_SLOT_FILES) else ""
-            song_path = None
-            if song_hint:
-                candidate = os.path.join("songs", song_hint)
-                if os.path.exists(candidate):
-                    song_path = candidate
-                else:
-                    song_path = find_song(os.path.splitext(song_hint)[0])
-            if not song_path:
-                song_path = find_song(base)
-            if song_path:
-                play_song_by_path(song_path)
-            else:
-                st.info("No song found for this memory (placing mp3 in songs/ with matching name will play it).")
-            show_confetti()
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("")
-
-# ---------------- Pages 2..4 (auto messages) ----------------
-def page_auto(page_no, title, messages_list):
-    st.markdown(f"<div class='page-header'>{title}</div>", unsafe_allow_html=True)
-    for idx in range(1, ITEMS_PER_PAGE + 1):
-        base = f"page{page_no}.{idx}"
-        st.markdown("<div class='glow-box'>", unsafe_allow_html=True)
-        img_path = find_image(base)
-        if img_path:
-            try:
-                img = Image.open(img_path); img = ImageOps.exif_transpose(img)
-                st.image(img, use_column_width=True)
-            except Exception:
-                st.error("Image found but couldn't be opened.")
+# --------------- Reveal block for Page 1 (question -> reveal image+message+song) ---------------
+def page1_block(slot_index):
+    base_name = f"Page1.{slot_index}"  # this matches your filenames like Page1.1.jpg (case-sensitive)
+    # We will try the exact casing user used (they uploaded files like Page1.1.jpg)
+    question = QUESTIONS_PAGE1[slot_index - 1]
+    correct = ANSWERS_PAGE1[slot_index - 1].lower()
+    st.markdown("<div class='glow-box'>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-weight:700; color:#c81d62; margin-bottom:6px;'>{question}</div>", unsafe_allow_html=True)
+    key_in = f"p1_in_{slot_index}"
+    key_btn = f"p1_btn_{slot_index}"
+    key_rev = f"p1_rev_{slot_index}"
+    user = st.text_input("", key=key_in, placeholder="Type the answer and press Submit")
+    if st.button("Submit", key=key_btn):
+        if user.strip().lower() == correct and correct != "":
+            st.session_state[key_rev] = True
         else:
-            st.info(f"Place the image file named like images/{base}.jpg")
-        msg = messages_list[idx - 1] if idx - 1 < len(messages_list) else "You are wonderful in every way."
-        st.components.v1.html(typewriter_html(msg, f"auto_{page_no}_{idx}"), height=90)
+            st.error("Not quite — try again 🥺")
+    if st.session_state.get(key_rev, False):
+        # fetch image bytes from GitHub raw
+        image_bytes, used_path = fetch_image_from_repo(base_name)
+        if image_bytes:
+            stream_image_bytes(image_bytes)
+        else:
+            st.info(f"Image not found in repo. Upload file at: images/{base_name}.jpg (or {base_name.replace('.', '_')}.jpg).")
+        # message specific to page1 slot (crafted)
+        page1_msgs = [
+            "From your earliest days you shone — supercute doesn't capture your little miracle glow. Your eyes told stories before words did.",
+            "Your bond with Ma is woven of lullabies, warmth and unending care. That love made you who you are — tender, strong and luminous.",
+            "That red top moment — the world paused: that color met your glow and created a sun that day. Pure fire.",
+            "Evening lights wrap your face like poetry. No one captures dusk the way you do — soft, radiant and unforgettable."
+        ]
+        st.components.v1.html(typewriter_html_safe(page1_msgs[slot_index - 1], f"p1_msg_{slot_index}"), height=100)
+        # song: try hint filename then base_name
+        song_bytes, song_path = fetch_song_from_repo(SONG_HINTS_PAGE1[slot_index - 1])
+        if not song_bytes:
+            song_bytes, song_path = fetch_song_from_repo(f"song{slot_index}")  # song1, song2 etc
+        if not song_bytes:
+            song_bytes, song_path = fetch_song_from_repo(base_name)
+        if song_bytes:
+            stream_audio_bytes(song_bytes)
+        else:
+            st.info("No song found for this slot. Upload e.g. songs/song1.mp3 or songs/song1.1.mp3")
+        # confetti
+        st.components.v1.html("""
+            <canvas id='c' style='position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;'></canvas>
+            <script src='https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js'></script>
+            <script>
+              var myConfetti = confetti.create(document.getElementById('c'), { resize: true, useWorker: true });
+              myConfetti({particleCount: 200, spread: 150, origin: {y:0.6}});
+            </script>
+        """, height=0)
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("")
+
+# --------------- Pages 2..4 auto (no questions) ---------------
+def page_auto(page_no, messages):
+    title_map = {2: "✨ Qualities — The Magic You Carry", 3: "💞 Memories — Our Sweetest Moments", 4: "🌟 Future — A Beautiful Tomorrow Awaits"}
+    st.markdown(f"<div class='page-header'>{title_map.get(page_no, 'Page')}</div>", unsafe_allow_html=True)
+    for i in range(1, ITEMS_PER_PAGE + 1):
+        base = f"Page{page_no}.{i}"
+        st.markdown("<div class='glow-box'>", unsafe_allow_html=True)
+        img_bytes, used_path = fetch_image_from_repo(base)
+        if img_bytes:
+            stream_image_bytes(img_bytes)
+        else:
+            st.info(f"Image missing: images/{base}.jpg (or underscore variant).")
+        msg = messages[i-1] if i-1 < len(messages) else "You are wonderful in every way."
+        st.components.v1.html(typewriter_html_safe(msg, f"auto_{page_no}_{i}"), height=90)
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("")
 
-# ---------------- Final message page ----------------
-def page_letter():
+# --------------- Last message page ---------------
+def page_last():
     st.markdown("<div class='page-header'>💌 My Last Message For You</div>", unsafe_allow_html=True)
-    last_song_path = os.path.join("songs", LAST_SONG_FILE)
-    if os.path.exists(last_song_path):
-        play_song_by_path(last_song_path)
+    # play lastsong if available
+    b, p = fetch_song_from_repo(LAST_SONG)
+    if not b:
+        # try lastsong without extension or alternate names
+        b, p = fetch_song_from_repo("lastsong")
+    if b:
+        stream_audio_bytes(b)
     else:
-        st.info("Add songs/lastsong.mp3 to play a special song on this page.")
+        st.info("Upload songs/lastsong.mp3 to play a special song here.")
     st.markdown("""
     <div style='background:linear-gradient(180deg,#fff7fb,#fff1f6); padding:22px; border-radius:12px;
                 box-shadow:0 8px 30px rgba(255,120,150,0.08); font-size:18px; color:#b81c5a;'>
@@ -253,32 +292,37 @@ def page_letter():
     </div>
     """, unsafe_allow_html=True)
 
-# ---------------- Main routing ----------------
-if st.session_state.page == "home":
-    # show home buttons again
+# --------------- ROUTING ---------------
+# Home: show big buttons
+if st.session_state.get("page", "home") == "home":
     c1, c2, c3, c4, c5 = st.columns([1,1,1,1,0.6])
     with c1:
-        if st.button("🌈 Journey", key="hbtn_journey"): st.session_state.page = "journey"
+        if st.button("🌈 Journey", key="h_journey"): st.session_state.page = "journey"
     with c2:
-        if st.button("✨ Qualities", key="hbtn_qualities"): st.session_state.page = "qualities"
+        if st.button("✨ Qualities", key="h_qualities"): st.session_state.page = "qualities"
     with c3:
-        if st.button("💞 Memories", key="hbtn_memories"): st.session_state.page = "memories"
+        if st.button("💞 Memories", key="h_memories"): st.session_state.page = "memories"
     with c4:
-        if st.button("🌟 Future", key="hbtn_future"): st.session_state.page = "future"
+        if st.button("🌟 Future", key="h_future"): st.session_state.page = "future"
     with c5:
-        if st.button("💌 My Last Message", key="hbtn_letter"): st.session_state.page = "letter"
+        if st.button("💌 My Last Message", key="h_letter"): st.session_state.page = "letter"
 
-if st.session_state.page == "journey":
-    page_journey()
-elif st.session_state.page == "qualities":
-    page_auto(2, "✨ Qualities — The Magic You Carry", MESSAGES_PAGE2)
-elif st.session_state.page == "memories":
-    page_auto(3, "💞 Memories — Our Sweetest Moments", MESSAGES_PAGE3)
-elif st.session_state.page == "future":
-    page_auto(4, "🌟 Future — A Beautiful Tomorrow Awaits", MESSAGES_PAGE4)
-elif st.session_state.page == "letter":
-    page_letter()
+# Render chosen page
+page = st.session_state.get("page", "home")
+if page == "journey":
+    st.markdown("<div class='page-header'>🌈 Journey — From Childhood to Today</div>", unsafe_allow_html=True)
+    for s in range(1, ITEMS_PER_PAGE + 1):
+        page1_block(s)
+elif page == "qualities":
+    page_auto(2, MESSAGES_PAGE2)
+elif page == "memories":
+    page_auto(3, MESSAGES_PAGE3)
+elif page == "future":
+    page_auto(4, MESSAGES_PAGE4)
+elif page == "letter":
+    page_last()
 
+# back to home button
 st.markdown("<hr/>", unsafe_allow_html=True)
 if st.button("⬅️ Back to Home"):
     st.session_state.page = "home"
