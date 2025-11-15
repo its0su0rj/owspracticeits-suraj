@@ -27,24 +27,30 @@ QUESTIONS_PAGE1 = [
 ANSWERS_PAGE1 = ["supercute", "ma", "red", "evening"]  # case-insensitive
 
 # Prewritten romantic messages (auto-filled for pages 2..4)
+
 MESSAGES_PAGE2 = [
-    "Your intelligence sparkles like stars; your beauty only highlights it. You are flawless.",
-    "Confidence and kindness — you wear them both effortlessly. I admire you every day.",
-    "Your laugh breaks the clouds away — everything’s brighter with you in it.",
-    "You are a radiant presence; the world is softer when you smile."
+    "One thing I truly admire about you is how calm you are 🙂✨  No matter the situation, you handle everything with patience and grace 🌿💛. It’s such a peaceful and beautiful quality 🌸.",
+    "You are very sensitive in the most beautiful way 🌸🤍  You understand feelings deeply and care with a pure heart 💛✨. This softness makes you truly special 🌼.",
+    "You have always been a responsible and sincere person 🌟🙂  Whether it’s family, studies, or life, you take every step with honesty and maturity 🌿💛. People feel safe around you ✨.",
+    "You are genuinely a wonderful person — gorgeous, calm, caring and amazing in your own simple way ✨🌸🤍🙂  Your presence brings warmth and positivity, and you make everything around you more beautiful 💛🌼."
 ]
+
 MESSAGES_PAGE3 = [
-    "This memory is a warm lamp in my heart — forever glowing because of you.",
-    "Every photo with you is a chapter of joy I read again and again.",
-    "Your laughter in these moments still lives in my chest — soft and warm.",
-    "I fall for you again in every memory; thank you for being my favorite."
+    "Every memory of you shows how strong you truly are 💛✨  You have faced many moments with quiet courage, and you always rise again. Your inner strength is inspiring 🌿🌟.",
+    "When I look back at your journey, I see how beautifully you’ve grown 🌸🙂  You keep becoming a better, wiser, calmer version of yourself. Your progress is something to be proud of ✨🌼.",
+    "Your memories show one thing clearly — your heart has always been kind 🤍🌸  In every phase of life, you’ve carried goodness with you. The world truly needs more people like you 💛✨.",
+    "Every memory is a reminder that you deserve a bright, peaceful and happy future 🌅✨  You’ve come so far, and even more beautiful days are waiting for you. Keep moving forward with confidence 🌼💛."
 ]
+
+
 MESSAGES_PAGE4 = [
-    "The future looks golden because you will shine in everything you do.",
-    "I see travel, laughter, growth and us — all painted with your light.",
-    "You will achieve so much; your strength humbles and inspires me.",
-    "We'll turn tiny moments into a grand love story — and I can't wait."
+    "Your future will be as beautiful as your heart ✨🌸  With your charm, kindness and calm nature, life will open doors you never imagined. You are meant for wonderful things 💛🌿.",
+    "You are already glowing, and your future will shine even brighter ✨🙂  Your elegance, softness and confidence will take you far. The world hasn’t even seen your best yet 🌟💛.",
+    "With your responsibility, focus and pure intentions, success will naturally follow you 🌼✨  Your path is full of achievements, peace and happiness… because you truly deserve all of it 🤍💛.",
+    "You are beautiful, charming and ‘wow’ in every sense 🌸🌟🙂  Your future will reflect the same magic — full of joy, strength and endless possibilities. Life has amazing plans for you ✨💛."
 ]
+
+
 
 # Song hints / mapping for page1 (slot -> hint filename). We'll try multiple patterns for robustness.
 SONG_HINTS_PAGE1 = ["song1.mp3", "song2.mp3", "song3.mp3", "song4.mp3"]
@@ -158,7 +164,7 @@ def inject_background_music():
 inject_background_music()
 
 # --------------- Header and navigation ---------------
-st.markdown("<div class='main-title'>🎉 Happy Birthday! 🎉</div>", unsafe_allow_html=True)
+st.markdown("<div class='main-title'>🎉 Happiee b'day 😍⭐</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>A little interactive journey — unlock images, messages & songs ✨</div>", unsafe_allow_html=True)
 
 if 'page' not in st.session_state:
@@ -225,11 +231,12 @@ def page1_block(slot_index):
             st.info(f"Image not found in repo. Upload file at: images/{base_name}.jpg (or {base_name.replace('.', '_')}.jpg).")
         # message specific to page1 slot (crafted)
         page1_msgs = [
-            "supercute❣️ This little you is the cutest 🌸🙂So innocent, so happy… it’s nice to see how beautifully you’ve grown while keeping the same sweet nature  ",
-            "Your bond with Ma is woven of lullabies, warmth and unending care. That love made you who you are — tender, strong and luminous.",
-            "That red top moment — the world paused: that color met your glow and created a sun that day. Pure fire.",
-            "Evening lights wrap your face like poetry. No one captures dusk the way you do — soft, radiant and unforgettable."
+            "supercute❣️This little you is the cutest 🌸🙂  So innocent, so happy… it’s nice to see how beautifully you’ve grown while keeping the same sweet nature ✨💛.",
+            "This Diwali moment with your mom is so warm 🪔✨  You look peaceful, happy, and full of light. It’s a very simple but very lovely memory 🌼🙂.",
+            "This Rakhi picture has real emotion 🎀🙂  Coming home after a long time… that comfort and smile on your face says everything. It’s a pure and heart-touching moment 💛✨.",
+            "This Chhath Puja picture is just beautiful 🌅✨  You look calm, glowing, and truly at your best. The whole picture feels very peaceful and special 🌸🤍."
         ]
+        
         st.components.v1.html(typewriter_html_safe(page1_msgs[slot_index - 1], f"p1_msg_{slot_index}"), height=100)
         # song: try hint filename then base_name
         song_bytes, song_path = fetch_song_from_repo(SONG_HINTS_PAGE1[slot_index - 1])
