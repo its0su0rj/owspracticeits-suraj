@@ -15,7 +15,7 @@ RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}
 # UI / behavior
 ITEMS_PER_PAGE = 4
 
-st.set_page_config(page_title="🎉 Happy Birthday", layout="wide")
+st.set_page_config(page_title="Hey, happiee b'day ✨", layout="wide")
 
 # --------------- CONTENT YOU WANTED ----------------
 QUESTIONS_PAGE1 = [
