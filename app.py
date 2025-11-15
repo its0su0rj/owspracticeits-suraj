@@ -225,8 +225,7 @@ def page1_block(slot_index):
             st.info(f"Image not found in repo. Upload file at: images/{base_name}.jpg (or {base_name.replace('.', '_')}.jpg).")
         # message specific to page1 slot (crafted)
         page1_msgs = [
-            "supercute❣️ This little you is the cutest 🌸🙂
-             So innocent, so happy… it’s nice to see how beautifully you’ve grown while keeping the same sweet nature  ",
+            "supercute❣️ This little you is the cutest 🌸🙂So innocent, so happy… it’s nice to see how beautifully you’ve grown while keeping the same sweet nature  ",
             "Your bond with Ma is woven of lullabies, warmth and unending care. That love made you who you are — tender, strong and luminous.",
             "That red top moment — the world paused: that color met your glow and created a sun that day. Pure fire.",
             "Evening lights wrap your face like poetry. No one captures dusk the way you do — soft, radiant and unforgettable."
