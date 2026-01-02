@@ -36,7 +36,7 @@ def load_answers(ans_url):
 # -------------------
 def get_quiz_sets():
     return {
-        "January 2025  196Q": {
+        "budget": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
         },
@@ -60,7 +60,7 @@ def get_quiz_sets():
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025ans.csv"
         },
-        "July 2025 165Q": {
+        "space missions": {
             "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
         },
