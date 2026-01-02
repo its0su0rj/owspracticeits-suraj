@@ -1,335 +1,231 @@
-# app.py
-# Final: loads images & songs directly from GitHub raw URLs for repo its0su0rj/owspracticeits-suraj
-# Place this file in repo root. Ensure images/ and songs/ files exist in that repo.
-import streamlit as st
-from PIL import Image, ImageOps
-import requests, io, os, json, base64
+   import streamlit as st
+import pandas as pd
+import requests
+from io import StringIO
 
-# --------------- CONFIG ---------------
-REPO_OWNER = "its0su0rj"
-REPO_NAME  = "owspracticeits-suraj"
-BRANCH     = "main"   # change if your default branch is different
-
-RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
-
-# UI / behavior
-ITEMS_PER_PAGE = 4
-
-st.set_page_config(page_title="Hey, happiee b'day ✨", layout="wide")
-
-# --------------- CONTENT YOU WANTED ----------------
-QUESTIONS_PAGE1 = [
-    "1. In childhood you were cute or supercute? (Write 'cute' or 'supercute')",
-    "2. Best duo... with whom? (Write 'ma' or 'life partner')",
-    "3. Remember the first Rakhi trip — which colored top? (red or black)",
-    "4. You looked gorgeous during Chhath — more beautiful in evening or morning?"
-]
-ANSWERS_PAGE1 = ["supercute", "ma", "red", "evening"]  # case-insensitive
-
-# Prewritten romantic messages (auto-filled for pages 2..4)
-
-MESSAGES_PAGE2 = [
-    "One thing I truly admire about you is how calm you are 🙂✨  No matter the situation, you handle everything with patience and grace 🌿💛. It’s such a peaceful and beautiful quality 🌸.",
-    "You are very sensitive in the most beautiful way 🌸🤍  You understand feelings deeply and care with a pure heart 💛✨. This softness makes you truly special 🌼.",
-    "You have always been a responsible and sincere person 🌟🙂  Whether it’s family, studies, or life, you take every step with honesty and maturity 🌿💛. People feel safe around you ✨.",
-    "You are genuinely a wonderful person — gorgeous, calm, caring and amazing in your own simple way ✨🌸🤍🙂  Your presence brings warmth and positivity, and you make everything around you more beautiful 💛🌼."
-]
-
-MESSAGES_PAGE3 = [
-    "Every memory of you shows how strong you truly are 💛✨  You have faced many moments with quiet courage, and you always rise again. Your inner strength is inspiring 🌿🌟.",
-    "When I look back at your journey, I see how beautifully you’ve grown 🌸🙂  You keep becoming a better, wiser, calmer version of yourself. Your progress is something to be proud of ✨🌼.",
-    "Your memories show one thing clearly — your heart has always been kind 🤍🌸  In every phase of life, you’ve carried goodness with you. The world truly needs more people like you 💛✨.",
-    "Every memory is a reminder that you deserve a bright, peaceful and happy future 🌅✨  You’ve come so far, and even more beautiful days are waiting for you. Keep moving forward with confidence 🌼💛."
-]
-
-
-MESSAGES_PAGE4 = [
-    "Your future will be as beautiful as your heart ✨🌸  With your charm, kindness and calm nature, life will open doors you never imagined. You are meant for wonderful things 💛🌿.",
-    "You are already glowing, and your future will shine even brighter ✨🙂  Your elegance, softness and confidence will take you far. The world hasn’t even seen your best yet 🌟💛.",
-    "With your responsibility, focus and pure intentions, success will naturally follow you 🌼✨  Your path is full of achievements, peace and happiness… because you truly deserve all of it 🤍💛.",
-    "You are beautiful, charming and ‘wow’ in every sense 🌸🌟🙂  Your future will reflect the same magic — full of joy, strength and endless possibilities. Life has amazing plans for you ✨💛."
-]
-
-
-
-# Song hints / mapping for page1 (slot -> hint filename). We'll try multiple patterns for robustness.
-SONG_HINTS_PAGE1 = ["song1.mp3", "song2.mp3", "song3.mp3", "song4.mp3"]
-BACKGROUND_SONG = "background.mp3"
-LAST_SONG = "lastsong.mp3"
-
-# --------------- STYLING ---------------
-st.markdown("""
-<style>
-.main-title {text-align:center; font-size:44px; color:#ff2d6f; font-weight:900; margin-bottom:6px;}
-.subtitle {text-align:center; font-size:16px; color:#ff8fab; margin-bottom:14px;}
-button[kind="primary"], button[kind="secondary"], .stButton>button {
-  animation: heartbeat 1.6s infinite;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 22px rgba(255,77,109,0.12);
-  font-weight:700 !important;
-}
-.stButton>button:hover { box-shadow: 0 12px 34px rgba(255,50,90,0.2); transform: translateY(-3px); }
-@keyframes heartbeat { 0% {transform: scale(1);} 25% {transform: scale(1.06);} 40% {transform: scale(0.98);} 60% {transform: scale(1.03);} 100% {transform: scale(1);} }
-.glow-box { background: linear-gradient(180deg,#fff7fb,#fff1f6); padding:14px; border-radius:12px;
-           box-shadow: 0 8px 30px rgba(255,120,150,0.06); border: 1px solid rgba(255,100,140,0.08);
-           margin-bottom: 12px; }
-.heart { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); font-size:28px; z-index:9999; opacity:0.95;}
-.sparkle { position: fixed; top:-10px; font-size:20px; color:#ffd6e8; z-index:9998; pointer-events:none; }
-.typewriter { font-size:18px; color:#c81d62; font-weight:700; white-space: pre-wrap; }
-.page-header { text-align:center; font-size:28px; color:#ff3b6b; margin-top:10px; margin-bottom:8px; font-weight:800; }
-</style>
-<div class="heart">💖</div>
-<div class="sparkle" style="left:20%; animation: fall 6s linear infinite;">✨</div>
-<div class="sparkle" style="left:40%; animation: fall 7s linear infinite;">🌟</div>
-<div class="sparkle" style="left:60%; animation: fall 5.5s linear infinite;">💫</div>
-""", unsafe_allow_html=True)
-
-# --------------- HELPERS: fetch raw bytes from GitHub ---------------
-def raw_url(path):
-    """Return full raw URL for a file path in the repo."""
-    return RAW_BASE + path
-
-def try_fetch_bytes(path):
-    """Try GET raw URL, return bytes if 200 else None."""
-    url = raw_url(path)
+# -------------------
+# Load Questions CSV
+# -------------------
+def load_questions(file_url):
     try:
-        r = requests.get(url, timeout=12)
-        if r.status_code == 200:
-            return r.content
-    except Exception:
-        return None
-    return None
+        response = requests.get(file_url)
+        response.raise_for_status()
+        csv_data = StringIO(response.text)
+        df = pd.read_csv(csv_data, quotechar='"', skipinitialspace=True)
+        return df
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
 
-def fetch_image_from_repo(base_name):
-    """Try several variants for image: images/<base>.ext or images/<base_underscore>.ext"""
-    exts = [".jpg", ".jpeg", ".png", ".webp"]
-    candidates = []
-    # prefer dot variant like Page1.1
-    candidates += [f"images/{base_name}{e}" for e in exts]
-    # underscore variant
-    candidates += [f"images/{base_name.replace('.', '_')}{e}" for e in exts]
-    for p in candidates:
-        b = try_fetch_bytes(p)
-        if b:
-            return b, p  # bytes, path used
-    return None, None
-
-def fetch_song_from_repo(base_name):
-    exts = [".mp3", ".wav", ".ogg"]
-    # patterns to try: songs/<hint>, songs/<base>
-    candidates = []
-    candidates += [f"songs/{base_name}"]
-    # if base_name has extension already, try as-is; otherwise add exts
-    if os.path.splitext(base_name)[1]:
-        candidates += [f"songs/{base_name}"]
-    else:
-        candidates += [f"songs/{base_name}{e}" for e in exts]
-        candidates += [f"songs/{base_name.replace('.', '_')}{e}" for e in exts]
-    for p in candidates:
-        b = try_fetch_bytes(p)
-        if b:
-            return b, p
-    return None, None
-
-def stream_image_bytes(image_bytes):
-    """Open bytes as PIL Image and show via st.image"""
+# -------------------
+# Load Answers CSV
+# -------------------
+def load_answers(ans_url):
     try:
-        img = Image.open(io.BytesIO(image_bytes))
-        img = ImageOps.exif_transpose(img)
-        st.image(img, use_column_width=True)
-    except Exception:
-        st.error("Found image bytes but couldn't decode image.")
+        response = requests.get(ans_url)
+        response.raise_for_status()
+        csv_data = StringIO(response.text)
+        df = pd.read_csv(csv_data)
+        return df
+    except Exception as e:
+        st.error(f"Error loading answers: {e}")
+        return pd.DataFrame()
 
-def stream_audio_bytes(audio_bytes):
-    try:
-        st.audio(audio_bytes, format="audio/mp3")
-    except Exception:
-        # fallback: try raw URL streaming (rare)
-        st.error("Could not play audio bytes directly.")
+# -------------------
+# Quiz Sets
+# -------------------
+def get_quiz_sets():
+    return {
+        "January 2025  196Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
+        },
+        "February 2025 161Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
+        },
+        "March 2025  140Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025ans.csv"
+        },
+        "April 2025  155Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025ans.csv"
+        },
+        "May 2025  155Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025ans.csv"
+        },
+        "June 2025 140Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025ans.csv"
+        },
+        "July 2025 165Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
+        },
+        "BIHAR CURRENT AFFAIRS 175Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharca.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharcaans.csv"
+        }
+    }
 
-# --------------- Background music injection (small floating player) ---------------
-def inject_background_music():
-    # try background in songs/background.mp3 or raw filename
-    b, p = fetch_song_from_repo(BACKGROUND_SONG)
-    if b:
-        # embed base64 like earlier
-        b64 = base64.b64encode(b).decode()
-        html = f"""
-        <audio autoplay loop controls style="position:fixed; bottom:16px; right:16px; width:260px; z-index:9999; opacity:0.92;">
-            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-        </audio>
-        """
-        st.markdown(html, unsafe_allow_html=True)
+# -------------------
+# Run Quiz Page
+# -------------------
+def run_quiz(selected_set, quiz_sets):
+    if st.button("⬅️ Back to Home"):
+        st.session_state.page = "home"
+        st.session_state.answers = {}
+        st.session_state.submitted = False
+        st.session_state.results = None
+        return
 
-inject_background_music()
+    st.subheader(f"📖 {selected_set} Quiz")
 
-# --------------- Header and navigation ---------------
-st.markdown("<div class='main-title'>🎉 Happiee b'day 😍⭐</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>A little interactive journey — unlock images, messages & songs ✨</div>", unsafe_allow_html=True)
+    df_q = load_questions(quiz_sets[selected_set]["questions"])
+    df_a = load_answers(quiz_sets[selected_set]["answers"])
 
-if 'page' not in st.session_state:
-    st.session_state.page = "home"
+    if df_q.empty or df_a.empty:
+        st.warning("⚠️ Data not available for this set.")
+        return
 
-if st.session_state.page == "home":
-    c1, c2, c3, c4, c5 = st.columns([1,1,1,1,0.6])
-    with c1:
-        if st.button("🌈 Journey", key="btn_journey"): st.session_state.page = "journey"
-    with c2:
-        if st.button("✨ Qualities", key="btn_qualities"): st.session_state.page = "qualities"
-    with c3:
-        if st.button("💞 Memories", key="btn_memories"): st.session_state.page = "memories"
-    with c4:
-        if st.button("🌟 Future", key="btn_future"): st.session_state.page = "future"
-    with c5:
-        if st.button("💌 My Last Message", key="btn_letter"): st.session_state.page = "letter"
-if st.session_state.page == "home":
-    st.info("Click any section to begin — Journey, Qualities, Memories, Future or My Last Message")
+    total_questions = len(df_q)
 
-# --------------- Utility: safe typewriter HTML ---------------
-def typewriter_html_safe(text, uid):
-    js_text = json.dumps(text)  # safely escaped JS string
-    html = f"""
-    <div class="typewriter"><span id="{uid}"></span></div>
-    <script>
-      const txt = {js_text};
-      const el = document.getElementById('{uid}');
-      let i = 0;
-      (function typeWriter(){{
-        if(i < txt.length){{
-          el.innerHTML += txt.charAt(i);
-          i++;
-          setTimeout(typeWriter, 18);
-        }}
-      }})();
-    </script>
-    """
-    return html
+    # --- Session state init ---
+    if "answers" not in st.session_state:
+        st.session_state.answers = {}
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
+    if "results" not in st.session_state:
+        st.session_state.results = None
 
-# --------------- Reveal block for Page 1 (question -> reveal image+message+song) ---------------
-def page1_block(slot_index):
-    base_name = f"Page1.{slot_index}"  # this matches your filenames like Page1.1.jpg (case-sensitive)
-    # We will try the exact casing user used (they uploaded files like Page1.1.jpg)
-    question = QUESTIONS_PAGE1[slot_index - 1]
-    correct = ANSWERS_PAGE1[slot_index - 1].lower()
-    st.markdown("<div class='glow-box'>", unsafe_allow_html=True)
-    st.markdown(f"<div style='font-weight:700; color:#c81d62; margin-bottom:6px;'>{question}</div>", unsafe_allow_html=True)
-    key_in = f"p1_in_{slot_index}"
-    key_btn = f"p1_btn_{slot_index}"
-    key_rev = f"p1_rev_{slot_index}"
-    user = st.text_input("", key=key_in, placeholder="Type the answer and press Submit")
-    if st.button("Submit", key=key_btn):
-        if user.strip().lower() == correct and correct != "":
-            st.session_state[key_rev] = True
+    # --- If not submitted: show quiz ---
+    if not st.session_state.submitted:
+        for index, row in df_q.iterrows():
+            st.write(f"**Q{index+1}: {row['question']}**")
+            options = [row['1'], row['2'], row['3'], row['4']]
+            # restore previous choice if available
+            prev_choice = st.session_state.answers.get(index, None)
+            choice = st.radio(
+                f"Your answer for Q{index+1}:",
+                options,
+                index=options.index(prev_choice) if prev_choice in options else 0,
+                key=f"{selected_set}_{index}"
+            )
+            st.session_state.answers[index] = choice
+
+            
+
+        if st.button("✅ Submit"):
+            score = 0
+            incorrect = []
+            for i, row in df_q.iterrows():
+                correct_option_number = df_a.iloc[i]["correct_ans"]
+                correct_option_text = row[str(correct_option_number)]
+                user_answer = st.session_state.answers.get(i, None)
+                if user_answer == correct_option_text:
+                    score += 1
+                else:
+                    incorrect.append((row['question'], correct_option_text))
+
+            st.session_state.results = {
+                "score": score,
+                "incorrect": incorrect,
+                "total": total_questions
+            }
+            st.session_state.submitted = True
+
+    # --- If submitted: show results ---
+    
+    if st.session_state.submitted and st.session_state.results:
+        score = st.session_state.results["score"]
+        incorrect = st.session_state.results["incorrect"]
+        total_questions = st.session_state.results["total"]
+
+        st.success(f"### 🎯 Your Score: {score}/{total_questions}")
+        if incorrect:
+            st.error("❌ Incorrect Answers:")
+            for q, correct in incorrect:
+                st.markdown(f"- **Q:** {q}  \n  ✅ Correct: {correct}")
         else:
-            st.error("Not quite — try again 🥺")
-    if st.session_state.get(key_rev, False):
-        # fetch image bytes from GitHub raw
-        image_bytes, used_path = fetch_image_from_repo(base_name)
-        if image_bytes:
-            stream_image_bytes(image_bytes)
-        else:
-            st.info(f"Image not found in repo. Upload file at: images/{base_name}.jpg (or {base_name.replace('.', '_')}.jpg).")
-        # message specific to page1 slot (crafted)
-        page1_msgs = [
-            "supercute❣️This little you is the cutest 🌸🙂  So innocent, so happy… it’s nice to see how beautifully you’ve grown while keeping the same sweet nature ✨💛.",
-            "This Diwali moment with your mom is so warm 🪔✨  You look peaceful, happy, and full of light. It’s a very simple but very lovely memory 🌼🙂.",
-            "This Rakhi picture has real emotion 🎀🙂  Coming home after a long time… that comfort and smile on your face says everything. It’s a pure and heart-touching moment 💛✨.",
-            "This Chhath Puja picture is just beautiful 🌅✨  You look calm, glowing, and truly at your best. The whole picture feels very peaceful and special 🌸🤍."
-        ]
-        
-        st.components.v1.html(typewriter_html_safe(page1_msgs[slot_index - 1], f"p1_msg_{slot_index}"), height=100)
-        # song: try hint filename then base_name
-        song_bytes, song_path = fetch_song_from_repo(SONG_HINTS_PAGE1[slot_index - 1])
-        if not song_bytes:
-            song_bytes, song_path = fetch_song_from_repo(f"song{slot_index}")  # song1, song2 etc
-        if not song_bytes:
-            song_bytes, song_path = fetch_song_from_repo(base_name)
-        if song_bytes:
-            stream_audio_bytes(song_bytes)
-        else:
-            st.info("No song found for this slot. Upload e.g. songs/song1.mp3 or songs/song1.1.mp3")
-        # confetti
-        st.components.v1.html("""
-            <canvas id='c' style='position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;'></canvas>
-            <script src='https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js'></script>
-            <script>
-              var myConfetti = confetti.create(document.getElementById('c'), { resize: true, useWorker: true });
-              myConfetti({particleCount: 200, spread: 150, origin: {y:0.6}});
-            </script>
-        """, height=0)
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("")
+            st.balloons()
+            st.success("🎉 Perfect! All answers correct.")
+         # ✅ Extra Back to Home button at end
+        if st.button("⬅️ Back to Home", key="back_home_after_results"):
+           st.session_state.page = "home"
+           st.session_state.answers = {}
+           st.session_state.submitted = False
+           st.session_state.results = None
+   
 
-# --------------- Pages 2..4 auto (no questions) ---------------
-def page_auto(page_no, messages):
-    title_map = {2: "✨ Qualities — The Magic You Carry", 3: "💞 Memories — Our Sweetest Moments", 4: "🌟 Future — A Beautiful Tomorrow Awaits"}
-    st.markdown(f"<div class='page-header'>{title_map.get(page_no, 'Page')}</div>", unsafe_allow_html=True)
-    for i in range(1, ITEMS_PER_PAGE + 1):
-        base = f"Page{page_no}.{i}"
-        st.markdown("<div class='glow-box'>", unsafe_allow_html=True)
-        img_bytes, used_path = fetch_image_from_repo(base)
-        if img_bytes:
-            stream_image_bytes(img_bytes)
-        else:
-            st.info(f"Image missing: images/{base}.jpg (or underscore variant).")
-        msg = messages[i-1] if i-1 < len(messages) else "You are wonderful in every way."
-        st.components.v1.html(typewriter_html_safe(msg, f"auto_{page_no}_{i}"), height=90)
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("")
+# -------------------
+# Homepage Layout
+# -------------------
+def homepage():
+    st.header("📘 Current Affairs Quiz by Suraj")
 
-# --------------- Last message page ---------------
-def page_last():
-    st.markdown("<div class='page-header'>💌 My Last Message For You</div>", unsafe_allow_html=True)
-    # play lastsong if available
-    b, p = fetch_song_from_repo(LAST_SONG)
-    if not b:
-        # try lastsong without extension or alternate names
-        b, p = fetch_song_from_repo("lastsong")
-    if b:
-        stream_audio_bytes(b)
-    else:
-        st.info("Upload songs/lastsong.mp3 to play a special song here.")
+    # Gradient Colorful Buttons
     st.markdown("""
-    <div style='background:linear-gradient(180deg,#fff7fb,#fff1f6); padding:22px; border-radius:12px;
-                box-shadow:0 8px 30px rgba(255,120,150,0.08); font-size:18px; color:#b81c5a;'>
-    ❤️ If love had a shape, it would be the warmth in your smile.<br><br>
-    🌙 Every moment with you becomes a favorite memory stitched with laughter.<br><br>
-    ✨ You are not only breathtaking — your mind, your courage, your kindness make you rare and endlessly precious.<br><br>
-    🎀 I love you more than words; I wish you galaxies on your birthday and always. Happy Birthday. 💖
-    </div>
+    <style>
+    div.stButton > button {
+        width: 100%;  /* ✅ Full width button */
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 0.6em 1.2em;
+        transition: 0.3s;
+    }
+    div.stButton > button:hover {
+        background: linear-gradient(135deg, #45a049, #1976D2);
+        transform: scale(1.05);
+    }
+    </style>
     """, unsafe_allow_html=True)
 
-# --------------- ROUTING ---------------
-# Home: show big buttons
-if st.session_state.get("page", "home") == "home":
-    c1, c2, c3, c4, c5 = st.columns([1,1,1,1,0.6])
-    with c1:
-        if st.button("🌈 Journey", key="h_journey"): st.session_state.page = "journey"
-    with c2:
-        if st.button("✨ Qualities", key="h_qualities"): st.session_state.page = "qualities"
-    with c3:
-        if st.button("💞 Memories", key="h_memories"): st.session_state.page = "memories"
-    with c4:
-        if st.button("🌟 Future", key="h_future"): st.session_state.page = "future"
-    with c5:
-        if st.button("💌 My Last Message", key="h_letter"): st.session_state.page = "letter"
+    quiz_sets = get_quiz_sets()
+    #st.subheader("📅 Monthly Quiz Sets")
+    st.subheader("📅 Monthly Quiz Sets: (source KGS)")
+    st.markdown("<p style='color:red; font-weight:bold;'>**CLIK 2 TIMES ON EACH SET</p>", unsafe_allow_html=True)
 
-# Render chosen page
-page = st.session_state.get("page", "home")
-if page == "journey":
-    st.markdown("<div class='page-header'>🌈 Journey — From Childhood to Today</div>", unsafe_allow_html=True)
-    for s in range(1, ITEMS_PER_PAGE + 1):
-        page1_block(s)
-elif page == "qualities":
-    page_auto(2, MESSAGES_PAGE2)
-elif page == "memories":
-    page_auto(3, MESSAGES_PAGE3)
-elif page == "future":
-    page_auto(4, MESSAGES_PAGE4)
-elif page == "letter":
-    page_last()
 
-# back to home button
-st.markdown("<hr/>", unsafe_allow_html=True)
-if st.button("⬅️ Back to Home"):
-    st.session_state.page = "home"
+    # ✅ Keep buttons in correct order & full width
+    for set_name in quiz_sets.keys():
+        if st.button(set_name, key=set_name):
+            st.session_state.page = "quiz"
+            st.session_state.selected_set = set_name
+            st.session_state.answers = {}
+            st.session_state.submitted = False
+            st.session_state.results = None
+
+    st.markdown("---")
+    st.subheader("🌍 BiharCA Section")
+    st.info("👉 Bihar Current Affairs quizzes coming soon.")
+
+    st.markdown("---")
+    st.subheader("📂 Topicwise Section")
+    st.info("👉 Topicwise quizzes coming soon.")
+
+
+
+# -------------------
+# Main
+# -------------------
+def main():
+    if "page" not in st.session_state:
+        st.session_state.page = "home"
+    if "selected_set" not in st.session_state:
+        st.session_state.selected_set = None
+
+    quiz_sets = get_quiz_sets()
+
+    if st.session_state.page == "home":
+        homepage()
+    elif st.session_state.page == "quiz" and st.session_state.selected_set:
+        run_quiz(st.session_state.selected_set, quiz_sets)
+    else:
+        homepage()
+
+if __name__ == "__main__":
+    main()  
