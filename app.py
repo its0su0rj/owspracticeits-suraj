@@ -41,7 +41,7 @@ def get_quiz_sets():
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
         },
         "schemes": {
-            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february.csv",
             "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
         },
         "March 2025  140Q": {
