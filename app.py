@@ -152,7 +152,7 @@ elif st.session_state.stage == "love":
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='main-title'>She Finally Said YES 💖✨</div>", unsafe_allow_html=True)
+    st.markdown("<div class='main-title'>finally yes😍, myyy bubuuuhhhh😘 💖✨</div>", unsafe_allow_html=True)
 
     st.markdown("""
     <div class='card'>
