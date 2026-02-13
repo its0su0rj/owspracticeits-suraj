@@ -1,13 +1,11 @@
 # app.py
-import streamlit as st
-import base64
-import requests
-import os
-import json
-from PIL import Image
-import io
+# Valentine Special – Auto Fetch Version (Compatible with your Birthday Repo)
 
-# ---------------- CONFIG ----------------
+import streamlit as st
+from PIL import Image, ImageOps
+import requests, io, os, base64, json
+
+# ---------------- CONFIG (Same as your birthday app) ----------------
 REPO_OWNER = "its0su0rj"
 REPO_NAME  = "owspracticeits-suraj"
 BRANCH     = "main"
@@ -16,68 +14,84 @@ RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}
 
 st.set_page_config(page_title="For You ❤️", layout="wide")
 
-# -------------- HELPERS ---------------
+# ---------------- HELPERS (Same Logic as Before) ----------------
 
 def raw_url(path):
     return RAW_BASE + path
 
-def fetch_bytes(path):
+def try_fetch_bytes(path):
     try:
-        r = requests.get(raw_url(path))
+        r = requests.get(raw_url(path), timeout=10)
         if r.status_code == 200:
             return r.content
     except:
-        pass
+        return None
     return None
 
-def show_image(path):
-    img_bytes = fetch_bytes(path)
+def fetch_image_auto(base_name):
+    exts = [".jpg", ".jpeg", ".png", ".webp"]
+    for e in exts:
+        b = try_fetch_bytes(f"images/{base_name}{e}")
+        if b:
+            return b
+    return None
+
+def fetch_song_auto(base_name):
+    exts = [".mp3", ".wav", ".ogg"]
+    for e in exts:
+        b = try_fetch_bytes(f"songs/{base_name}{e}")
+        if b:
+            return b
+    return None
+
+def show_image(base):
+    img_bytes = fetch_image_auto(base)
     if img_bytes:
         img = Image.open(io.BytesIO(img_bytes))
+        img = ImageOps.exif_transpose(img)
         st.image(img, use_column_width=True)
 
-def play_audio(path):
-    audio_bytes = fetch_bytes(path)
-    if audio_bytes:
-        st.audio(audio_bytes, format="audio/mp3")
+def play_song(base):
+    song = fetch_song_auto(base)
+    if song:
+        st.audio(song, format="audio/mp3")
 
-# -------------- SESSION ---------------
+# ---------------- SESSION ----------------
 if "stage" not in st.session_state:
     st.session_state.stage = "proposal"
 
-# =====================================================
-# 💘 STAGE 1 — PROPOSAL PAGE
-# =====================================================
+# =========================================================
+# 💘 STAGE 1 — PERFECT PROPOSAL PAGE
+# =========================================================
 
 if st.session_state.stage == "proposal":
 
     html = """
     <style>
-    body {
-        background: linear-gradient(135deg,#fff0f5,#ffe6f0);
-    }
-    .container {
+    .main-box {
         text-align:center;
         padding-top:80px;
     }
     .title {
-        font-size:36px;
+        font-size:38px;
         font-weight:800;
         color:#ff2d6f;
         margin-bottom:40px;
     }
     .btn {
-        padding:14px 30px;
+        padding:14px 32px;
         font-size:20px;
         border:none;
         border-radius:14px;
         cursor:pointer;
-        margin:10px;
+        margin:15px;
+        position:relative;
         transition:0.2s ease;
     }
     .yes {
         background:#ff4d6d;
         color:white;
+        box-shadow:0 8px 25px rgba(255,50,90,0.3);
     }
     .no {
         background:#444;
@@ -86,12 +100,16 @@ if st.session_state.stage == "proposal":
     }
     </style>
 
-    <div class="container">
+    <div class="main-box">
         <div class="title">
             Nirali… will you be my Valentine? 💖
         </div>
 
-        <button class="btn yes" onclick="window.parent.postMessage('YES_CLICKED','*')">Yes 💘</button>
+        <button class="btn yes"
+        onclick="window.parent.postMessage({type:'YES'}, '*')">
+        Yes 💘
+        </button>
+
         <button class="btn no" id="noBtn">No 😢</button>
     </div>
 
@@ -108,97 +126,101 @@ if st.session_state.stage == "proposal":
 
     st.components.v1.html(html, height=500)
 
-    # Listen for YES click
-    if st.button("I CLICKED YES ❤️"):
+    # Hidden Streamlit trigger button
+    if st.button("Continue ❤️"):
         st.session_state.stage = "love"
         st.rerun()
 
-# =====================================================
-# 💕 STAGE 2 — LOVE EXPERIENCE PAGE
-# =====================================================
+# =========================================================
+# 💕 STAGE 2 — BEAUTIFUL LOVE EXPERIENCE
+# =========================================================
 
 elif st.session_state.stage == "love":
 
+    # Background Music (Auto fetch: songs/background.mp3)
+    bg = fetch_song_auto("background")
+    if bg:
+        b64 = base64.b64encode(bg).decode()
+        st.markdown(f"""
+        <audio autoplay loop>
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+        </audio>
+        """, unsafe_allow_html=True)
+
+    # Elegant Styling
     st.markdown("""
     <style>
     .main-title {
         text-align:center;
-        font-size:44px;
-        color:#ff2d6f;
+        font-size:48px;
         font-weight:900;
+        color:#ff2d6f;
         margin-bottom:20px;
         animation: glow 2s infinite alternate;
     }
     @keyframes glow {
-        from { text-shadow: 0 0 10px #ff99bb; }
-        to { text-shadow: 0 0 25px #ff2d6f; }
+        from { text-shadow:0 0 10px #ff99bb; }
+        to { text-shadow:0 0 30px #ff2d6f; }
     }
     .card {
-        background: linear-gradient(180deg,#fff7fb,#fff1f6);
-        padding:20px;
+        background:linear-gradient(180deg,#fff7fb,#fff1f6);
+        padding:22px;
         border-radius:18px;
-        margin-bottom:30px;
-        box-shadow:0 10px 40px rgba(255,100,140,0.1);
+        margin-bottom:25px;
+        box-shadow:0 10px 40px rgba(255,120,150,0.15);
+        font-size:18px;
+        color:#c81d62;
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='main-title'>She Said YES 💖✨</div>", unsafe_allow_html=True)
 
-    # 🎵 Background Music
-    play_audio("songs/valentine.mp3")
-
-    # 💌 Romantic Message
+    # Romantic Message
     st.markdown("""
     <div class='card'>
-    From the first smile… to every little memory…  
-    You have made my world softer, warmer, brighter.  
+    From childhood memories… to today’s beautiful moments,  
+    every phase of life feels warmer with you in it.  
 
-    Today isn’t just Valentine’s Day.  
-    It’s the day I celebrate YOU.  
-
-    And I promise —  
-    I will always choose you. ❤️
+    You are not just special.  
+    You are my peace. My happiness. My forever. 💘
     </div>
     """, unsafe_allow_html=True)
 
-    # 📸 PHOTO GALLERY
+    # Auto Image Gallery
     st.markdown("## Our Beautiful Moments 💞")
 
     cols = st.columns(2)
 
-    images = [
-        "images/v1.jpg",
-        "images/v2.jpg",
-        "images/v3.jpg",
-        "images/v4.jpg"
-    ]
-
-    for i, img in enumerate(images):
+    for i in range(1, 7):  # will try Page2.1 ... Page2.6
+        base_name = f"Page2.{i}"
         with cols[i % 2]:
-            show_image(img)
+            show_image(base_name)
 
-    # 💖 Final Message
+    # Special Song Auto Fetch (songs/love.mp3)
+    play_song("love")
+
+    # Final Message
     st.markdown("""
     <div class='card'>
-    You are my calm in chaos.  
-    My happiness in ordinary days.  
-    My favorite notification.  
+    I don’t promise perfect days…  
+    but I promise to stay beside you on every imperfect one.  
 
-    I love you more than words can explain. 💘
+    Happy Valentine’s Day ❤️  
+    And thank you for choosing me.
     </div>
     """, unsafe_allow_html=True)
 
-    # 🎉 Confetti
+    # Confetti
     st.components.v1.html("""
     <canvas id="c" style="position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
     var myConfetti = confetti.create(document.getElementById('c'), { resize: true });
-    myConfetti({ particleCount: 250, spread: 150 });
+    myConfetti({ particleCount: 300, spread: 160 });
     </script>
     """, height=0)
 
-    if st.button("🔄 Back to Proposal"):
+    if st.button("⬅ Back"):
         st.session_state.stage = "proposal"
         st.rerun()
