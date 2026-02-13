@@ -170,7 +170,7 @@ elif st.session_state.stage == "love":
 
     for i in range(1, 7):
         with cols[i % 2]:
-            show_image(f"Page2.{i}")
+            show_image(f"Page5.{i}")
 
     play_song("love")
 
