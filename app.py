@@ -63,29 +63,32 @@ if "stage" not in st.session_state:
 # =========================================================
 # 💘 STAGE 1 — PERFECT PROPOSAL PAGE
 # =========================================================
+# =========================================================
+# 💘 STAGE 1 — SMART PROPOSAL PAGE (Mobile Friendly)
+# =========================================================
 
 if st.session_state.stage == "proposal":
 
-    html = """
+    proposal_html = """
     <style>
     .main-box {
         text-align:center;
         padding-top:80px;
+        position:relative;
     }
     .title {
-        font-size:38px;
+        font-size:30px;
         font-weight:800;
         color:#ff2d6f;
         margin-bottom:40px;
     }
     .btn {
-        padding:14px 32px;
-        font-size:20px;
+        padding:14px 30px;
+        font-size:18px;
         border:none;
         border-radius:14px;
         cursor:pointer;
         margin:15px;
-        position:relative;
         transition:0.2s ease;
     }
     .yes {
@@ -105,31 +108,79 @@ if st.session_state.stage == "proposal":
             Nirali… will you be my Valentine? 💖
         </div>
 
-        <button class="btn yes"
-        onclick="window.parent.postMessage({type:'YES'}, '*')">
-        Yes 💘
-        </button>
-
+        <button class="btn yes" onclick="sendYes()">Yes 💘</button>
         <button class="btn no" id="noBtn">No 😢</button>
     </div>
 
     <script>
+    let attempts = 0;
     const noBtn = document.getElementById("noBtn");
 
-    noBtn.addEventListener("mouseover", function(){
-        const x = Math.random()*400 - 200;
-        const y = Math.random()*200 - 100;
-        noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    // For Desktop (hover)
+    noBtn.addEventListener("mouseover", moveButton);
+
+    // For Mobile (touch)
+    noBtn.addEventListener("touchstart", moveButton);
+
+    function moveButton(e){
+        if(attempts < 3){
+            e.preventDefault();
+            attempts++;
+            const x = Math.random()*250 - 125;
+            const y = Math.random()*150 - 75;
+            noBtn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+    }
+
+    // After 3 attempts allow click
+    noBtn.addEventListener("click", function(){
+        if(attempts >= 3){
+            document.querySelector(".main-box").innerHTML = `
+                <div class="title">
+                    Are you sure? 🥺💔
+                </div>
+                <button class="btn yes" onclick="sendYes()">
+                    Okay fine… YES 💖
+                </button>
+            `;
+        }
     });
+
+    function sendYes(){
+        window.parent.postMessage({type:'VALENTINE_YES'}, '*');
+    }
     </script>
     """
 
-    st.components.v1.html(html, height=500)
+    # Listen to JS message
+    val = st.components.v1.html(proposal_html, height=500)
 
-    # Hidden Streamlit trigger button
-    if st.button("Continue ❤️"):
+    # This hidden listener auto-refresh trick
+    if "go_next" not in st.session_state:
+        st.session_state.go_next = False
+
+    # Invisible trigger using query param trick
+    query_params = st.experimental_get_query_params()
+    if "yes" in query_params:
         st.session_state.stage = "love"
+        st.experimental_set_query_params()
         st.rerun()
+
+    # JavaScript redirect helper
+    st.components.v1.html("""
+    <script>
+    window.addEventListener("message", function(event){
+        if(event.data.type === "VALENTINE_YES"){
+            const url = new URL(window.location.href);
+            url.searchParams.set("yes", "1");
+            window.location.href = url.toString();
+        }
+    });
+    </script>
+    """, height=0)
+
+
+    
 
 # =========================================================
 # 💕 STAGE 2 — BEAUTIFUL LOVE EXPERIENCE
