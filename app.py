@@ -1,159 +1,204 @@
+# app.py
 import streamlit as st
-import streamlit.components.v1 as components
+import base64
+import requests
+import os
+import json
+from PIL import Image
+import io
 
-st.set_page_config(page_title="Valentine 💖", page_icon="💘")
+# ---------------- CONFIG ----------------
+REPO_OWNER = "its0su0rj"
+REPO_NAME  = "owspracticeits-suraj"
+BRANCH     = "main"
 
-html_code = """
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-@keyframes floatUp {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(-120vh); opacity: 0; }
-}
+RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
 
-body {
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(135deg, #fde2e4, #fadadd, #fff1f7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Poppins', sans-serif;
-    overflow: hidden;
-}
+st.set_page_config(page_title="For You ❤️", layout="wide")
 
-.card {
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(14px);
-    padding: 45px 35px;
-    border-radius: 35px;
-    width: 330px;
-    text-align: center;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
-    position: relative;
-}
+# -------------- HELPERS ---------------
 
-.face {
-    font-size: 52px;
-    margin-bottom: 10px;
-    transition: transform 0.3s ease;
-}
+def raw_url(path):
+    return RAW_BASE + path
 
-h2 {
-    font-size: 22px;
-    margin-bottom: 30px;
-}
+def fetch_bytes(path):
+    try:
+        r = requests.get(raw_url(path))
+        if r.status_code == 200:
+            return r.content
+    except:
+        pass
+    return None
 
-.buttons {
-    position: relative;
-    height: 90px;
-}
+def show_image(path):
+    img_bytes = fetch_bytes(path)
+    if img_bytes:
+        img = Image.open(io.BytesIO(img_bytes))
+        st.image(img, use_column_width=True)
 
-.btn-yes {
-    background: linear-gradient(135deg, #ff4d6d, #ff8fab);
-    color: white;
-    border: none;
-    padding: 14px 34px;
-    font-size: 18px;
-    border-radius: 35px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
+def play_audio(path):
+    audio_bytes = fetch_bytes(path)
+    if audio_bytes:
+        st.audio(audio_bytes, format="audio/mp3")
 
-.btn-yes:hover {
-    transform: scale(1.12);
-}
+# -------------- SESSION ---------------
+if "stage" not in st.session_state:
+    st.session_state.stage = "proposal"
 
-.btn-no {
-    background: #e6e6e6;
-    color: #333;
-    border: none;
-    padding: 14px 34px;
-    font-size: 18px;
-    border-radius: 35px;
-    cursor: pointer;
-    position: absolute;
-    left: 170px;
-    top: 10px;
-    transition: all 0.25s ease;
-}
+# =====================================================
+# 💘 STAGE 1 — PROPOSAL PAGE
+# =====================================================
 
-#result {
-    margin-top: 22px;
-    font-size: 22px;
-}
+if st.session_state.stage == "proposal":
 
-.heart {
-    position: absolute;
-    bottom: -30px;
-    font-size: 22px;
-    animation: floatUp linear infinite;
-}
-</style>
-</head>
+    html = """
+    <style>
+    body {
+        background: linear-gradient(135deg,#fff0f5,#ffe6f0);
+    }
+    .container {
+        text-align:center;
+        padding-top:80px;
+    }
+    .title {
+        font-size:36px;
+        font-weight:800;
+        color:#ff2d6f;
+        margin-bottom:40px;
+    }
+    .btn {
+        padding:14px 30px;
+        font-size:20px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        margin:10px;
+        transition:0.2s ease;
+    }
+    .yes {
+        background:#ff4d6d;
+        color:white;
+    }
+    .no {
+        background:#444;
+        color:white;
+        position:absolute;
+    }
+    </style>
 
-<body>
+    <div class="container">
+        <div class="title">
+            Nirali… will you be my Valentine? 💖
+        </div>
 
-<div class="card">
-    <div class="face" id="face">😳</div>
-    <h2>Will you be my Valentine? 💕</h2>
-
-    <div class="buttons">
-        <button class="btn-yes" onclick="sayYes()">Yes</button>
-        <button class="btn-no" id="noBtn">No</button>
+        <button class="btn yes" onclick="window.parent.postMessage('YES_CLICKED','*')">Yes 💘</button>
+        <button class="btn no" id="noBtn">No 😢</button>
     </div>
 
-    <div id="result"></div>
-</div>
+    <script>
+    const noBtn = document.getElementById("noBtn");
 
-<script>
-let noCount = 0;
-const noBtn = document.getElementById("noBtn");
-const face = document.getElementById("face");
-const area = document.querySelector(".buttons");
+    noBtn.addEventListener("mouseover", function(){
+        const x = Math.random()*400 - 200;
+        const y = Math.random()*200 - 100;
+        noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    });
+    </script>
+    """
 
-noBtn.addEventListener("mouseover", () => {
-    noCount++;
+    st.components.v1.html(html, height=500)
 
-    face.innerHTML = noCount < 3 ? "🥺" : "😭";
+    # Listen for YES click
+    if st.button("I CLICKED YES ❤️"):
+        st.session_state.stage = "love"
+        st.rerun()
 
-    const maxX = area.clientWidth - noBtn.offsetWidth;
-    const maxY = area.clientHeight - noBtn.offsetHeight;
+# =====================================================
+# 💕 STAGE 2 — LOVE EXPERIENCE PAGE
+# =====================================================
 
-    noBtn.style.left = Math.random() * maxX + "px";
-    noBtn.style.top = Math.random() * maxY + "px";
-    noBtn.style.transform = `scale(${Math.max(0.5, 1 - noCount * 0.1)})`;
+elif st.session_state.stage == "love":
 
-    if (noCount >= 6) {
-        noBtn.style.display = "none";
-        face.innerHTML = "😔";
+    st.markdown("""
+    <style>
+    .main-title {
+        text-align:center;
+        font-size:44px;
+        color:#ff2d6f;
+        font-weight:900;
+        margin-bottom:20px;
+        animation: glow 2s infinite alternate;
     }
-});
-
-function sayYes() {
-    face.innerHTML = "🥰";
-    document.getElementById("result").innerHTML = "💖 YAY!!! You made my day 💖";
-    launchHearts();
-}
-
-function launchHearts() {
-    for (let i = 0; i < 30; i++) {
-        const heart = document.createElement("div");
-        heart.className = "heart";
-        heart.innerHTML = Math.random() > 0.5 ? "💖" : "✨";
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = (3 + Math.random() * 3) + "s";
-        document.body.appendChild(heart);
-
-        setTimeout(() => heart.remove(), 6000);
+    @keyframes glow {
+        from { text-shadow: 0 0 10px #ff99bb; }
+        to { text-shadow: 0 0 25px #ff2d6f; }
     }
-}
-</script>
+    .card {
+        background: linear-gradient(180deg,#fff7fb,#fff1f6);
+        padding:20px;
+        border-radius:18px;
+        margin-bottom:30px;
+        box-shadow:0 10px 40px rgba(255,100,140,0.1);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-</body>
-</html>
-"""
+    st.markdown("<div class='main-title'>She Said YES 💖✨</div>", unsafe_allow_html=True)
 
-components.html(html_code, height=650)
+    # 🎵 Background Music
+    play_audio("songs/valentine.mp3")
+
+    # 💌 Romantic Message
+    st.markdown("""
+    <div class='card'>
+    From the first smile… to every little memory…  
+    You have made my world softer, warmer, brighter.  
+
+    Today isn’t just Valentine’s Day.  
+    It’s the day I celebrate YOU.  
+
+    And I promise —  
+    I will always choose you. ❤️
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 📸 PHOTO GALLERY
+    st.markdown("## Our Beautiful Moments 💞")
+
+    cols = st.columns(2)
+
+    images = [
+        "images/v1.jpg",
+        "images/v2.jpg",
+        "images/v3.jpg",
+        "images/v4.jpg"
+    ]
+
+    for i, img in enumerate(images):
+        with cols[i % 2]:
+            show_image(img)
+
+    # 💖 Final Message
+    st.markdown("""
+    <div class='card'>
+    You are my calm in chaos.  
+    My happiness in ordinary days.  
+    My favorite notification.  
+
+    I love you more than words can explain. 💘
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 🎉 Confetti
+    st.components.v1.html("""
+    <canvas id="c" style="position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+    var myConfetti = confetti.create(document.getElementById('c'), { resize: true });
+    myConfetti({ particleCount: 250, spread: 150 });
+    </script>
+    """, height=0)
+
+    if st.button("🔄 Back to Proposal"):
+        st.session_state.stage = "proposal"
+        st.rerun()
