@@ -86,7 +86,7 @@ if st.session_state.stage == "proposal":
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='main-title'>hey,  will you be my Valentine? 💖</div>", unsafe_allow_html=True)
+    st.markdown("<div class='main-title'> Manchhi  will you be my Valentine? 💖</div>", unsafe_allow_html=True)
 
     # Pleading messages based on NO count
     if st.session_state.no_count == 1:
