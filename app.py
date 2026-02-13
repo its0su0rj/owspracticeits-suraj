@@ -1,11 +1,11 @@
 # app.py
-# Valentine Special – Auto Fetch Version (Compatible with your Birthday Repo)
+# Clean Valentine Loop Version (No Moving Button)
 
 import streamlit as st
 from PIL import Image, ImageOps
-import requests, io, os, base64, json
+import requests, io, os, base64
 
-# ---------------- CONFIG (Same as your birthday app) ----------------
+# ---------------- CONFIG ----------------
 REPO_OWNER = "its0su0rj"
 REPO_NAME  = "owspracticeits-suraj"
 BRANCH     = "main"
@@ -14,12 +14,12 @@ RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}
 
 st.set_page_config(page_title="For You ❤️", layout="wide")
 
-# ---------------- HELPERS (Same Logic as Before) ----------------
+# ---------------- FETCH HELPERS ----------------
 
 def raw_url(path):
     return RAW_BASE + path
 
-def try_fetch_bytes(path):
+def try_fetch(path):
     try:
         r = requests.get(raw_url(path), timeout=10)
         if r.status_code == 200:
@@ -28,18 +28,16 @@ def try_fetch_bytes(path):
         return None
     return None
 
-def fetch_image_auto(base_name):
-    exts = [".jpg", ".jpeg", ".png", ".webp"]
-    for e in exts:
-        b = try_fetch_bytes(f"images/{base_name}{e}")
+def fetch_image_auto(base):
+    for ext in [".jpg", ".jpeg", ".png", ".webp"]:
+        b = try_fetch(f"images/{base}{ext}")
         if b:
             return b
     return None
 
-def fetch_song_auto(base_name):
-    exts = [".mp3", ".wav", ".ogg"]
-    for e in exts:
-        b = try_fetch_bytes(f"songs/{base_name}{e}")
+def fetch_song_auto(base):
+    for ext in [".mp3", ".wav", ".ogg"]:
+        b = try_fetch(f"songs/{base}{ext}")
         if b:
             return b
     return None
@@ -57,138 +55,68 @@ def play_song(base):
         st.audio(song, format="audio/mp3")
 
 # ---------------- SESSION ----------------
+
 if "stage" not in st.session_state:
     st.session_state.stage = "proposal"
 
-# =========================================================
-# 💘 STAGE 1 — PERFECT PROPOSAL PAGE
-# =========================================================
-# =========================================================
-# 💘 STAGE 1 — SMART PROPOSAL PAGE (Mobile Friendly)
-# =========================================================
+if "no_count" not in st.session_state:
+    st.session_state.no_count = 0
+
+# ======================================================
+# 💘 STAGE 1 — PROPOSAL LOOP
+# ======================================================
 
 if st.session_state.stage == "proposal":
 
-    proposal_html = """
+    st.markdown("""
     <style>
-    .main-box {
+    .main-title {
         text-align:center;
-        padding-top:80px;
-        position:relative;
-    }
-    .title {
-        font-size:30px;
+        font-size:34px;
         font-weight:800;
         color:#ff2d6f;
-        margin-bottom:40px;
+        margin-bottom:30px;
     }
-    .btn {
-        padding:14px 30px;
-        font-size:18px;
-        border:none;
-        border-radius:14px;
-        cursor:pointer;
-        margin:15px;
-        transition:0.2s ease;
-    }
-    .yes {
-        background:#ff4d6d;
-        color:white;
-        box-shadow:0 8px 25px rgba(255,50,90,0.3);
-    }
-    .no {
-        background:#444;
-        color:white;
-        position:absolute;
+    .plead {
+        text-align:center;
+        font-size:20px;
+        color:#c81d62;
+        margin-bottom:20px;
     }
     </style>
+    """, unsafe_allow_html=True)
 
-    <div class="main-box">
-        <div class="title">
-            Nirali… will you be my Valentine? 💖
-        </div>
+    st.markdown("<div class='main-title'>Nirali… will you be my Valentine? 💖</div>", unsafe_allow_html=True)
 
-        <button class="btn yes" onclick="sendYes()">Yes 💘</button>
-        <button class="btn no" id="noBtn">No 😢</button>
-    </div>
+    # Pleading messages based on NO count
+    if st.session_state.no_count == 1:
+        st.markdown("<div class='plead'>Please bubuu say yes na 🥺💞</div>", unsafe_allow_html=True)
 
-    <script>
-    let attempts = 0;
-    const noBtn = document.getElementById("noBtn");
+    elif st.session_state.no_count == 2:
+        st.markdown("<div class='plead'>Please na babu say yes 🥺💖</div>", unsafe_allow_html=True)
 
-    // For Desktop (hover)
-    noBtn.addEventListener("mouseover", moveButton);
+    elif st.session_state.no_count >= 3:
+        st.markdown("<div class='plead'>Areee kitna bhav khaogi 😭 Just say YES already 💘</div>", unsafe_allow_html=True)
 
-    // For Mobile (touch)
-    noBtn.addEventListener("touchstart", moveButton);
+    col1, col2 = st.columns(2)
 
-    function moveButton(e){
-        if(attempts < 3){
-            e.preventDefault();
-            attempts++;
-            const x = Math.random()*250 - 125;
-            const y = Math.random()*150 - 75;
-            noBtn.style.transform = `translate(${x}px, ${y}px)`;
-        }
-    }
+    with col1:
+        if st.button("YES 💘", use_container_width=True):
+            st.session_state.stage = "love"
+            st.rerun()
 
-    // After 3 attempts allow click
-    noBtn.addEventListener("click", function(){
-        if(attempts >= 3){
-            document.querySelector(".main-box").innerHTML = `
-                <div class="title">
-                    Are you sure? 🥺💔
-                </div>
-                <button class="btn yes" onclick="sendYes()">
-                    Okay fine… YES 💖
-                </button>
-            `;
-        }
-    });
+    with col2:
+        if st.button("NO 😢", use_container_width=True):
+            st.session_state.no_count += 1
+            st.rerun()
 
-    function sendYes(){
-        window.parent.postMessage({type:'VALENTINE_YES'}, '*');
-    }
-    </script>
-    """
-
-    # Listen to JS message
-    val = st.components.v1.html(proposal_html, height=500)
-
-    # This hidden listener auto-refresh trick
-    if "go_next" not in st.session_state:
-        st.session_state.go_next = False
-
-    # Invisible trigger using query param trick
-    query_params = st.experimental_get_query_params()
-    if "yes" in query_params:
-        st.session_state.stage = "love"
-        st.experimental_set_query_params()
-        st.rerun()
-
-    # JavaScript redirect helper
-    st.components.v1.html("""
-    <script>
-    window.addEventListener("message", function(event){
-        if(event.data.type === "VALENTINE_YES"){
-            const url = new URL(window.location.href);
-            url.searchParams.set("yes", "1");
-            window.location.href = url.toString();
-        }
-    });
-    </script>
-    """, height=0)
-
-
-    
-
-# =========================================================
-# 💕 STAGE 2 — BEAUTIFUL LOVE EXPERIENCE
-# =========================================================
+# ======================================================
+# 💕 STAGE 2 — LOVE PAGE (Auto Fetch Same Structure)
+# ======================================================
 
 elif st.session_state.stage == "love":
 
-    # Background Music (Auto fetch: songs/background.mp3)
+    # Background Music (songs/background.mp3)
     bg = fetch_song_auto("background")
     if bg:
         b64 = base64.b64encode(bg).decode()
@@ -198,12 +126,11 @@ elif st.session_state.stage == "love":
         </audio>
         """, unsafe_allow_html=True)
 
-    # Elegant Styling
     st.markdown("""
     <style>
     .main-title {
         text-align:center;
-        font-size:48px;
+        font-size:44px;
         font-weight:900;
         color:#ff2d6f;
         margin-bottom:20px;
@@ -225,44 +152,38 @@ elif st.session_state.stage == "love":
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='main-title'>She Said YES 💖✨</div>", unsafe_allow_html=True)
+    st.markdown("<div class='main-title'>She Finally Said YES 💖✨</div>", unsafe_allow_html=True)
 
-    # Romantic Message
     st.markdown("""
     <div class='card'>
-    From childhood memories… to today’s beautiful moments,  
-    every phase of life feels warmer with you in it.  
+    From every memory we’ve shared…  
+    to every smile you’ve given me…  
 
-    You are not just special.  
-    You are my peace. My happiness. My forever. 💘
+    You are my favorite part of life.  
+    My calm. My happiness. My forever. 💘
     </div>
     """, unsafe_allow_html=True)
 
-    # Auto Image Gallery
     st.markdown("## Our Beautiful Moments 💞")
 
     cols = st.columns(2)
 
-    for i in range(1, 7):  # will try Page2.1 ... Page2.6
-        base_name = f"Page2.{i}"
+    for i in range(1, 7):
         with cols[i % 2]:
-            show_image(base_name)
+            show_image(f"Page2.{i}")
 
-    # Special Song Auto Fetch (songs/love.mp3)
     play_song("love")
 
-    # Final Message
     st.markdown("""
     <div class='card'>
-    I don’t promise perfect days…  
-    but I promise to stay beside you on every imperfect one.  
+    I don’t promise a perfect world…  
+    but I promise to stand beside you in every imperfect one.  
 
     Happy Valentine’s Day ❤️  
     And thank you for choosing me.
     </div>
     """, unsafe_allow_html=True)
 
-    # Confetti
     st.components.v1.html("""
     <canvas id="c" style="position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -272,6 +193,7 @@ elif st.session_state.stage == "love":
     </script>
     """, height=0)
 
-    if st.button("⬅ Back"):
+    if st.button("🔄 Restart"):
         st.session_state.stage = "proposal"
+        st.session_state.no_count = 0
         st.rerun()
