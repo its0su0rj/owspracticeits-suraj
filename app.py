@@ -1,199 +1,231 @@
-# app.py
-# Clean Valentine Loop Version (No Moving Button)
-
 import streamlit as st
-from PIL import Image, ImageOps
-import requests, io, os, base64
+import pandas as pd
+import requests
+from io import StringIO
 
-# ---------------- CONFIG ----------------
-REPO_OWNER = "its0su0rj"
-REPO_NAME  = "owspracticeits-suraj"
-BRANCH     = "main"
-
-RAW_BASE = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/{BRANCH}/"
-
-st.set_page_config(page_title="For You ❤️", layout="wide")
-
-# ---------------- FETCH HELPERS ----------------
-
-def raw_url(path):
-    return RAW_BASE + path
-
-def try_fetch(path):
+# -------------------
+# Load Questions CSV
+# -------------------
+def load_questions(file_url):
     try:
-        r = requests.get(raw_url(path), timeout=10)
-        if r.status_code == 200:
-            return r.content
-    except:
-        return None
-    return None
+        response = requests.get(file_url)
+        response.raise_for_status()
+        csv_data = StringIO(response.text)
+        df = pd.read_csv(csv_data, quotechar='"', skipinitialspace=True)
+        return df
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
 
-def fetch_image_auto(base):
-    for ext in [".jpg", ".jpeg", ".png", ".webp"]:
-        b = try_fetch(f"images/{base}{ext}")
-        if b:
-            return b
-    return None
+# -------------------
+# Load Answers CSV
+# -------------------
+def load_answers(ans_url):
+    try:
+        response = requests.get(ans_url)
+        response.raise_for_status()
+        csv_data = StringIO(response.text)
+        df = pd.read_csv(csv_data)
+        return df
+    except Exception as e:
+        st.error(f"Error loading answers: {e}")
+        return pd.DataFrame()
 
-def fetch_song_auto(base):
-    for ext in [".mp3", ".wav", ".ogg"]:
-        b = try_fetch(f"songs/{base}{ext}")
-        if b:
-            return b
-    return None
+# -------------------
+# Quiz Sets
+# -------------------
+def get_quiz_sets():
+    return {
+        "January 2025  196Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/january2025ans.csv"
+        },
+        "February 2025 161Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/february2025ans.csv"
+        },
+        "March 2025  140Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/march2025ans.csv"
+        },
+        "April 2025  155Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/april2025ans.csv"
+        },
+        "May 2025  155Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/may2025ans.csv"
+        },
+        "June 2025 140Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/june2025ans.csv"
+        },
+        "July 2025 165Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/july2025ans.csv"
+        },
+        "BIHAR CURRENT AFFAIRS 175Q": {
+            "questions": "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharca.csv",
+            "answers":   "https://raw.githubusercontent.com/its0su0rj/owspracticeits-suraj/main/biharcaans.csv"
+        }
+    }
 
-def show_image(base):
-    img_bytes = fetch_image_auto(base)
-    if img_bytes:
-        img = Image.open(io.BytesIO(img_bytes))
-        img = ImageOps.exif_transpose(img)
-        st.image(img, use_column_width=True)
+# -------------------
+# Run Quiz Page
+# -------------------
+def run_quiz(selected_set, quiz_sets):
+    if st.button("⬅️ Back to Home"):
+        st.session_state.page = "home"
+        st.session_state.answers = {}
+        st.session_state.submitted = False
+        st.session_state.results = None
+        return
 
-def play_song(base):
-    song = fetch_song_auto(base)
-    if song:
-        st.audio(song, format="audio/mp3")
+    st.subheader(f"📖 {selected_set} Quiz")
 
-# ---------------- SESSION ----------------
+    df_q = load_questions(quiz_sets[selected_set]["questions"])
+    df_a = load_answers(quiz_sets[selected_set]["answers"])
 
-if "stage" not in st.session_state:
-    st.session_state.stage = "proposal"
+    if df_q.empty or df_a.empty:
+        st.warning("⚠️ Data not available for this set.")
+        return
 
-if "no_count" not in st.session_state:
-    st.session_state.no_count = 0
+    total_questions = len(df_q)
 
-# ======================================================
-# 💘 STAGE 1 — PROPOSAL LOOP
-# ======================================================
+    # --- Session state init ---
+    if "answers" not in st.session_state:
+        st.session_state.answers = {}
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
+    if "results" not in st.session_state:
+        st.session_state.results = None
 
-if st.session_state.stage == "proposal":
+    # --- If not submitted: show quiz ---
+    if not st.session_state.submitted:
+        for index, row in df_q.iterrows():
+            st.write(f"**Q{index+1}: {row['question']}**")
+            options = [row['1'], row['2'], row['3'], row['4']]
+            # restore previous choice if available
+            prev_choice = st.session_state.answers.get(index, None)
+            choice = st.radio(
+                f"Your answer for Q{index+1}:",
+                options,
+                index=options.index(prev_choice) if prev_choice in options else 0,
+                key=f"{selected_set}_{index}"
+            )
+            st.session_state.answers[index] = choice
 
+            
+
+        if st.button("✅ Submit"):
+            score = 0
+            incorrect = []
+            for i, row in df_q.iterrows():
+                correct_option_number = df_a.iloc[i]["correct_ans"]
+                correct_option_text = row[str(correct_option_number)]
+                user_answer = st.session_state.answers.get(i, None)
+                if user_answer == correct_option_text:
+                    score += 1
+                else:
+                    incorrect.append((row['question'], correct_option_text))
+
+            st.session_state.results = {
+                "score": score,
+                "incorrect": incorrect,
+                "total": total_questions
+            }
+            st.session_state.submitted = True
+
+    # --- If submitted: show results ---
+    
+    if st.session_state.submitted and st.session_state.results:
+        score = st.session_state.results["score"]
+        incorrect = st.session_state.results["incorrect"]
+        total_questions = st.session_state.results["total"]
+
+        st.success(f"### 🎯 Your Score: {score}/{total_questions}")
+        if incorrect:
+            st.error("❌ Incorrect Answers:")
+            for q, correct in incorrect:
+                st.markdown(f"- **Q:** {q}  \n  ✅ Correct: {correct}")
+        else:
+            st.balloons()
+            st.success("🎉 Perfect! All answers correct.")
+         # ✅ Extra Back to Home button at end
+        if st.button("⬅️ Back to Home", key="back_home_after_results"):
+           st.session_state.page = "home"
+           st.session_state.answers = {}
+           st.session_state.submitted = False
+           st.session_state.results = None
+   
+
+# -------------------
+# Homepage Layout
+# -------------------
+def homepage():
+    st.header("📘 Current Affairs Quiz by Suraj")
+
+    # Gradient Colorful Buttons
     st.markdown("""
     <style>
-    .main-title {
-        text-align:center;
-        font-size:34px;
-        font-weight:800;
-        color:#ff2d6f;
-        margin-bottom:30px;
+    div.stButton > button {
+        width: 100%;  /* ✅ Full width button */
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 0.6em 1.2em;
+        transition: 0.3s;
     }
-    .plead {
-        text-align:center;
-        font-size:20px;
-        color:#c81d62;
-        margin-bottom:20px;
+    div.stButton > button:hover {
+        background: linear-gradient(135deg, #45a049, #1976D2);
+        transform: scale(1.05);
     }
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='main-title'> Manchhi  will you be my Valentine? 💖</div>", unsafe_allow_html=True)
+    quiz_sets = get_quiz_sets()
+    #st.subheader("📅 Monthly Quiz Sets")
+    st.subheader("📅 Monthly Quiz Sets: (source KGS)")
+    st.markdown("<p style='color:red; font-weight:bold;'>**CLIK 2 TIMES ON EACH SET</p>", unsafe_allow_html=True)
 
-    # Pleading messages based on NO count
-    if st.session_state.no_count == 1:
-        st.markdown("<div class='plead'>Please bubuu say yes na 🥺💞</div>", unsafe_allow_html=True)
 
-    elif st.session_state.no_count == 2:
-        st.markdown("<div class='plead'>Please na babu say yes 🥺💖</div>", unsafe_allow_html=True)
+    # ✅ Keep buttons in correct order & full width
+    for set_name in quiz_sets.keys():
+        if st.button(set_name, key=set_name):
+            st.session_state.page = "quiz"
+            st.session_state.selected_set = set_name
+            st.session_state.answers = {}
+            st.session_state.submitted = False
+            st.session_state.results = None
 
-    elif st.session_state.no_count >= 3:
-        st.markdown("<div class='plead'>Areee kitna bhav khaogi 😭 Just say YES already 💘</div>", unsafe_allow_html=True)
+    st.markdown("---")
+    st.subheader("🌍 BiharCA Section")
+    st.info("👉 Bihar Current Affairs quizzes coming soon.")
 
-    col1, col2 = st.columns(2)
+    st.markdown("---")
+    st.subheader("📂 Topicwise Section")
+    st.info("👉 Topicwise quizzes coming soon.")
 
-    with col1:
-        if st.button("YES 💘", use_container_width=True):
-            st.session_state.stage = "love"
-            st.rerun()
 
-    with col2:
-        if st.button("NO 😢", use_container_width=True):
-            st.session_state.no_count += 1
-            st.rerun()
 
-# ======================================================
-# 💕 STAGE 2 — LOVE PAGE (Auto Fetch Same Structure)
-# ======================================================
+# -------------------
+# Main
+# -------------------
+def main():
+    if "page" not in st.session_state:
+        st.session_state.page = "home"
+    if "selected_set" not in st.session_state:
+        st.session_state.selected_set = None
 
-elif st.session_state.stage == "love":
+    quiz_sets = get_quiz_sets()
 
-    # Background Music (songs/background.mp3)
-    bg = fetch_song_auto("background")
-    if bg:
-        b64 = base64.b64encode(bg).decode()
-        st.markdown(f"""
-        <audio autoplay loop>
-            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-        </audio>
-        """, unsafe_allow_html=True)
+    if st.session_state.page == "home":
+        homepage()
+    elif st.session_state.page == "quiz" and st.session_state.selected_set:
+        run_quiz(st.session_state.selected_set, quiz_sets)
+    else:
+        homepage()
 
-    st.markdown("""
-    <style>
-    .main-title {
-        text-align:center;
-        font-size:44px;
-        font-weight:900;
-        color:#ff2d6f;
-        margin-bottom:20px;
-        animation: glow 2s infinite alternate;
-    }
-    @keyframes glow {
-        from { text-shadow:0 0 10px #ff99bb; }
-        to { text-shadow:0 0 30px #ff2d6f; }
-    }
-    .card {
-        background:linear-gradient(180deg,#fff7fb,#fff1f6);
-        padding:22px;
-        border-radius:18px;
-        margin-bottom:25px;
-        box-shadow:0 10px 40px rgba(255,120,150,0.15);
-        font-size:18px;
-        color:#c81d62;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<div class='main-title'>finally yes😍, myyy bubuuuhhhh😘 💖✨</div>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class='card'>
-    From every memory we’ve shared…  
-    to every smile you’ve given me…  
-
-    You are my favorite part of life.  
-    My calm. My happiness. My forever. 💘
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("## Our Beautiful Moments 💞")
-
-    cols = st.columns(2)
-
-    for i in range(1, 7):
-        with cols[i % 2]:
-            show_image(f"Page5.{i}")
-
-    play_song("love")
-
-    st.markdown("""
-    <div class='card'>
-    I don’t promise a perfect world…  
-    but I promise to stand beside you in every imperfect one.  
-
-    Happy Valentine’s Day ❤️  
-    And thank you for choosing me.
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.components.v1.html("""
-    <canvas id="c" style="position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;"></canvas>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-    var myConfetti = confetti.create(document.getElementById('c'), { resize: true });
-    myConfetti({ particleCount: 300, spread: 160 });
-    </script>
-    """, height=0)
-
-    if st.button("🔄 Restart"):
-        st.session_state.stage = "proposal"
-        st.session_state.no_count = 0
-        st.rerun()
+if __name__ == "__main__":
+    main()
